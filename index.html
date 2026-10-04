@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cloud Gaming France — actualités, tests, guides, comparatifs et vidéos autour du cloud gaming.">
+  <title>Cloud Gaming France — Le cloud gaming, sans frontières</title>
+
+  <style>
+    :root {
+      --bg: #020914;
+      --bg-2: #061425;
+      --card: rgba(8, 27, 48, .82);
+      --card-2: #09213a;
+      --line: rgba(42, 190, 255, .28);
+      --text: #f5f9ff;
+      --muted: #9db0c6;
+      --cyan: #16c7ff;
+      --cyan-2: #008cff;
+      --green: #8bd629;
+      --danger: #ff263b;
+      --radius: 18px;
+      --max: 1180px;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 70% 0%, rgba(0, 168, 255, .14), transparent 34rem),
+        radial-gradient(circle at 10% 25%, rgba(0, 89, 255, .08), transparent 28rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button, input { font: inherit; }
+
+    .container {
+      width: min(calc(100% - 32px), var(--max));
+      margin-inline: auto;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(2, 9, 20, .84);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .nav {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      gap: 26px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 28px;
+      border: 3px solid var(--cyan);
+      border-radius: 50% 50% 45% 45%;
+      position: relative;
+      box-shadow: 0 0 20px rgba(22,199,255,.25);
+    }
+
+    .brand-icon::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      right: 7px;
+      bottom: 5px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: -13px 4px 0 -1px var(--cyan);
+    }
+
+    .brand span {
+      color: var(--cyan);
+      display: block;
+      font-size: 9px;
+      letter-spacing: .42em;
+      margin-top: -2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 21px;
+      margin-left: auto;
+      align-items: center;
+    }
+
+    nav a {
+      color: #c9d5e3;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    nav a:hover { color: var(--cyan); }
+
+    .youtube-btn, .primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 11px 17px;
+      border-radius: 11px;
+      background: var(--danger);
+      color: white;
+      font-weight: 800;
+      border: 0;
+      box-shadow: 0 10px 25px rgba(255,38,59,.2);
+    }
+
+    .mobile-menu { display: none; }
+
+    /* HERO */
+    .hero {
+      min-height: 570px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background:
+        linear-gradient(90deg, rgba(2,9,20,.97) 0%, rgba(2,9,20,.82) 43%, rgba(2,9,20,.28) 100%),
+        linear-gradient(180deg, rgba(2,9,20,0) 55%, var(--bg) 100%),
+        url("https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1800&q=85") center/cover;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 68% 45%, rgba(0,174,255,.34), transparent 24rem),
+        linear-gradient(90deg, transparent 0 50%, rgba(0,132,255,.08) 100%);
+      mix-blend-mode: screen;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      min-height: 570px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 680px;
+      padding-block: 80px;
+    }
+
+    .eyebrow {
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 13px;
+    }
+
+    h1 {
+      font-size: clamp(44px, 6vw, 76px);
+      line-height: .98;
+      margin: 0 0 22px;
+      letter-spacing: -.055em;
+      max-width: 700px;
+    }
+
+    h1 strong {
+      color: var(--cyan);
+      text-shadow: 0 0 35px rgba(22,199,255,.18);
+    }
+
+    .hero p {
+      max-width: 610px;
+      color: #c4d1df;
+      font-size: 18px;
+      margin: 0 0 28px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border: 1px solid var(--cyan);
+      border-radius: 11px;
+      color: white;
+      font-weight: 800;
+      background: rgba(2,9,20,.35);
+    }
+
+    .secondary-btn:hover { background: rgba(22,199,255,.1); }
+
+    /* SECTIONS */
+    section { padding: 62px 0; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -.035em;
+    }
+
+    .section-head p { color: var(--muted); margin: 5px 0 0; }
+
+    .section-link {
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    /* VIDEO FEATURE */
+    .feature {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 18px;
+    }
+
+    .video-card, .community-card {
+      background: linear-gradient(145deg, rgba(9,36,62,.9), rgba(4,18,33,.92));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .video-thumb {
+      aspect-ratio: 16/9;
+      position: relative;
+      background:
+        linear-gradient(135deg, rgba(0,120,255,.2), rgba(0,0,0,.15)),
+        url("https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=1200&q=85") center/cover;
+    }
+
+    .play {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      width: 68px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #ff1730;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 12px 35px rgba(255,23,48,.35);
+    }
+
+    .video-info { padding: 20px; }
+    .video-info h3 { margin: 0 0 7px; font-size: 23px; }
+    .video-info p { margin: 0; color: var(--muted); }
+
+    .community-card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+    }
+
+    .community-card .icon { font-size: 35px; }
+    .community-card h3 { margin: 12px 0 8px; font-size: 25px; }
+    .community-card p { color: var(--muted); margin: 0 0 20px; }
+    .community-card .youtube-btn { width: fit-content; }
+
+    /* ARTICLES */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .article {
+      background: var(--card);
+      border: 1px solid rgba(22,199,255,.24);
+      border-radius: 15px;
+      overflow: hidden;
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .article:hover { transform: translateY(-4px); border-color: var(--cyan); }
+
+    .article-img {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #073b61, #10142b);
+      overflow: hidden;
+    }
+
+    .article-img img { width:100%; height:100%; object-fit:cover; }
+
+    .article-body { padding: 15px; }
+    .tag {
+      color: var(--cyan);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    .article h3 { font-size: 16px; line-height: 1.25; margin: 8px 0; }
+    .meta { color: #71859a; font-size: 12px; }
+
+    /* SERVICES */
+    .services {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .service {
+      min-height: 170px;
+      padding: 17px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, rgba(10,40,66,.9), rgba(5,19,35,.95));
+      border: 1px solid rgba(22,199,255,.26);
+    }
+
+    .service-logo {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .service-logo span { color: var(--cyan); }
+    .stars { color: #ffd54a; font-size: 13px; margin: 5px 0; }
+    .service small { color: var(--muted); }
+    .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; }
+    .chip {
+      padding: 4px 7px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px;
+      color: #a9bacb;
+      font-size: 10px;
+    }
+
+    /* GAMES + VIDEOS */
+    .games {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .game {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.09);
+      background: var(--card);
+    }
+
+    .game img { aspect-ratio: 16/9; width:100%; object-fit:cover; }
+    .game strong { display:block; padding: 9px 10px 11px; font-size: 12px; }
+
+    .videos {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .video-mini {
+      background: var(--card);
+      border-radius: 13px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .video-mini img { aspect-ratio: 16/9; object-fit:cover; width:100%; }
+    .video-mini div { padding: 11px; font-size: 13px; font-weight: 800; }
+
+    /* NEWSLETTER */
+    .newsletter {
+      padding: 36px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 90% 20%, rgba(22,199,255,.18), transparent 20rem),
+        linear-gradient(110deg, #06213a, #041324);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .newsletter h2 { margin: 0 0 7px; }
+    .newsletter p { margin: 0; color: var(--muted); }
+
+    .form {
+      display: flex;
+      gap: 8px;
+      min-width: min(100%, 480px);
+    }
+
+    .form input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid rgba(22,199,255,.45);
+      background: rgba(0,0,0,.2);
+      color: white;
+      padding: 13px 15px;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    .form button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--cyan);
+      color: #00111d;
+      font-weight: 900;
+      padding: 0 19px;
+      cursor: pointer;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 35px 0;
+      color: var(--muted);
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; }
+    .copyright { margin-top: 24px; font-size: 12px; color: #64778b; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1000px) {
+      nav { display: none; }
+      .mobile-menu { display: block; margin-left: auto; background: transparent; border: 0; color:white; font-size: 25px; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .services { grid-template-columns: repeat(3, 1fr); }
+      .games { grid-template-columns: repeat(3, 1fr); }
+      .videos { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 720px) {
+      .container { width: min(calc(100% - 22px), var(--max)); }
+      .hero, .hero-content { min-height: 610px; }
+      .hero {
+        background:
+          linear-gradient(180deg, rgba(2,9,20,.35), rgba(2,9,20,.97) 78%),
+          url("https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1100&q=85") center/cover;
+      }
+      h1 { font-size: 45px; }
+      .hero p { font-size: 16px; }
+      section { padding: 45px 0; }
+      .feature { grid-template-columns: 1fr; }
+      .grid-4, .services, .games, .videos { grid-template-columns: repeat(2, 1fr); }
+      .newsletter { flex-direction: column; align-items: stretch; padding: 25px; }
+      .form { min-width: 0; flex-direction: column; }
+      .form button { padding: 13px; }
+      .section-head { align-items: center; }
+      .section-head h2 { font-size: 23px; }
+      .community-card { min-height: 260px; }
+      .brand { font-size: 14px; }
+    }
+
+    @media (max-width: 430px) {
+      .grid-4, .services, .games, .videos { grid-template-columns: 1fr; }
+      .games { grid-template-columns: repeat(2, 1fr); }
+      .service { min-height: 145px; }
+      .hero-actions > * { width: 100%; }
+      .youtube-btn { justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container nav">
+    <a class="brand" href="#">
+      <div class="brand-icon" aria-hidden="true"></div>
+      <div>CLOUD GAMING <span>FRANCE</span></div>
+    </a>
+
+    <nav>
+      <a href="#actualites">Actualités</a>
+      <a href="#services">Services</a>
+      <a href="#jeux">Jeux</a>
+      <a href="#videos">Vidéos</a>
+      <a href="#guides">Guides</a>
+      <a href="#apropos">À propos</a>
+      <a class="youtube-btn" href="https://www.youtube.com/@CloudGamingFrance" target="_blank" rel="noopener">▶ YouTube</a>
+    </nav>
+
+    <button class="mobile-menu" onclick="toggleMenu()" aria-label="Ouvrir le menu">☰</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="eyebrow">☁ Cloud Gaming France</div>
+      <h1>Le cloud gaming,<br><strong>sans frontières.</strong></h1>
+      <p>
+        Toute l’actualité du cloud gaming, des tests, des comparatifs,
+        des guides et des vidéos, au même endroit.
+      </p>
+      <div class="hero-actions">
+        <a class="youtube-btn" href="#videos">▶ Voir les dernières vidéos</a>
+        <a class="secondary-btn" href="#services">Découvrir le cloud gaming</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DERNIERE VIDEO -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>▶ Dernière vidéo</h2>
+          <p>Retrouvez les dernières publications de la chaîne.</p>
+        </div>
+        <a class="section-link" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener">Voir sur YouTube →</a>
+      </div>
+
+      <div class="feature">
+        <article class="video-card">
+          <a href="https://www.youtube.com/@CloudGamingFrance" target="_blank" rel="noopener">
+            <div class="video-thumb">
+              <div class="play">▶</div>
+            </div>
+            <div class="video-info">
+              <h3>Les dernières nouveautés du cloud gaming</h3>
+              <p>Retrouvez ici votre dernière vidéo YouTube. Remplacez ce bloc par votre vidéo ou votre embed YouTube.</p>
+            </div>
+          </a>
+        </article>
+
+        <aside class="community-card">
+          <div class="icon">📺</div>
+          <h3>Rejoignez la communauté !</h3>
+          <p>Abonnez-vous à Cloud Gaming France pour ne manquer aucune actualité, aucun test et aucun guide.</p>
+          <a class="youtube-btn" href="https://www.youtube.com/@CloudGamingFrance?sub_confirmation=1" target="_blank" rel="noopener">▶ S’abonner sur YouTube</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTUALITES -->
+  <section id="actualites">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>⭐ À la une</h2>
+          <p>Les sujets importants du moment.</p>
+        </div>
+        <a class="section-link" href="#">Toutes les actualités →</a>
+      </div>
+
+      <div class="grid-4">
+        <article class="article">
+          <div class="article-img"><img src="https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=800&q=80" alt="Manette Xbox"></div>
+          <div class="article-body"><span class="tag">Actualité</span><h3>Les nouveautés du cloud gaming à suivre</h3><div class="meta">5 min de lecture</div></div>
+        </article>
+
+        <article class="article">
+          <div class="article-img"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=800&q=80" alt="Installation gaming"></div>
+          <div class="article-body"><span class="tag">Guide</span><h3>Quel service de cloud gaming est fait pour vous ?</h3><div class="meta">8 min de lecture</div></div>
+        </article>
+
+        <article class="article">
+          <div class="article-img"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Jeu vidéo"></div>
+          <div class="article-body"><span class="tag">Test</span><h3>Notre expérience du jeu en streaming</h3><div class="meta">6 min de lecture</div></div>
+        </article>
+
+        <article class="article">
+          <div class="article-img"><img src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?auto=format&fit=crop&w=800&q=80" alt="Cloud computing"></div>
+          <div class="article-body"><span class="tag">Actualité</span><h3>Les services cloud gaming évoluent</h3><div class="meta">4 min de lecture</div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>☁ Trouvez votre service de cloud gaming</h2>
+          <p>Comparez les principales plateformes.</p>
+        </div>
+        <a class="section-link" href="#">Comparer tous les services →</a>
+      </div>
+
+      <div class="services">
+        <div class="service"><div class="service-logo">🟢 <span>GeForce NOW</span></div><div class="stars">★★★★★</div><small>PC • Mac • Mobile</small><div class="chips"><span class="chip">4K</span><span class="chip">RTX</span></div></div>
+        <div class="service"><div class="service-logo">🟩 Xbox Cloud</div><div class="stars">★★★★☆</div><small>PC • Mobile • TV</small><div class="chips"><span class="chip">1080p</span><span class="chip">Game Pass</span></div></div>
+        <div class="service"><div class="service-logo">🟣 Boosteroid</div><div class="stars">★★★★☆</div><small>PC • Mac • Mobile</small><div class="chips"><span class="chip">4K</span><span class="chip">Browser</span></div></div>
+        <div class="service"><div class="service-logo">⚪ Shadow</div><div class="stars">★★★★☆</div><small>PC • Mac • Mobile</small><div class="chips"><span class="chip">PC Cloud</span><span class="chip">4K</span></div></div>
+        <div class="service"><div class="service-logo">🟣 Luna</div><div class="stars">★★★☆☆</div><small>PC • TV • Mobile</small><div class="chips"><span class="chip">1080p</span><span class="chip">Amazon</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JEUX -->
+  <section id="jeux">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>🎮 Les jeux du moment</h2>
+          <p>Découvrez les jeux à tester dans le cloud.</p>
+        </div>
+        <a class="section-link" href="#">Voir tous les jeux →</a>
+      </div>
+
+      <div class="games">
+        <div class="game"><img src="https://images.unsplash.com/photo-1542751110-97427bbecf20?auto=format&fit=crop&w=500&q=80" alt=""><strong>Fortnite</strong></div>
+        <div class="game"><img src="https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=500&q=80" alt=""><strong>Call of Duty</strong></div>
+        <div class="game"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=500&q=80" alt=""><strong>EA Sports FC</strong></div>
+        <div class="game"><img src="https://images.unsplash.com/photo-1605899435973-ca2d1a8861cf?auto=format&fit=crop&w=500&q=80" alt=""><strong>Cyberpunk 2077</strong></div>
+        <div class="game"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=500&q=80" alt=""><strong>Warzone</strong></div>
+        <div class="game"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=500&q=80" alt=""><strong>Hogwarts Legacy</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEOS -->
+  <section id="videos">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2>📺 Les dernières vidéos</h2>
+          <p>Les vidéos de Cloud Gaming France.</p>
+        </div>
+        <a class="section-link" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener">Toutes les vidéos →</a>
+      </div>
+
+      <div class="videos">
+        <a class="video-mini" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener"><img src="https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=700&q=80" alt=""><div>Guide complet du cloud gaming</div></a>
+        <a class="video-mini" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener"><img src="https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=700&q=80" alt=""><div>Nouveautés cloud gaming</div></a>
+        <a class="video-mini" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=700&q=80" alt=""><div>Test & avis</div></a>
+        <a class="video-mini" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener"><img src="https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=700&q=80" alt=""><div>Le cloud gaming expliqué</div></a>
+        <a class="video-mini" href="https://www.youtube.com/@CloudGamingFrance/videos" target="_blank" rel="noopener"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=700&q=80" alt=""><div>Les jeux gratuits du moment</div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section id="guides">
+    <div class="container">
+      <div class="newsletter">
+        <div>
+          <h2>📬 Restez à jour sur le cloud gaming</h2>
+          <p>Recevez les actualités, guides et bons plans directement par e-mail.</p>
+        </div>
+        <form class="form" onsubmit="subscribe(event)">
+          <input id="email" type="email" placeholder="Votre adresse e-mail" required>
+          <button type="submit">S’inscrire</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="apropos">
+  <div class="container">
+    <div class="footer-row">
+      <div>
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true"></div>
+          <div>CLOUD GAMING <span>FRANCE</span></div>
+        </div>
+        <p>Actualités • Tests • Guides • Comparatifs</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="https://www.youtube.com/@CloudGamingFrance" target="_blank" rel="noopener">YouTube</a>
+        <a href="#">X</a>
+        <a href="#">Discord</a>
+        <a href="#">Instagram</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+
+    <div class="copyright">© 2026 Cloud Gaming France. Tous droits réservés.</div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    const nav = document.querySelector("nav");
+    const visible = nav.style.display === "flex";
+    nav.style.display = visible ? "" : "flex";
+    if (!visible) {
+      nav.style.position = "absolute";
+      nav.style.top = "70px";
+      nav.style.left = "0";
+      nav.style.right = "0";
+      nav.style.padding = "20px";
+      nav.style.flexDirection = "column";
+      nav.style.alignItems = "stretch";
+      nav.style.background = "rgba(2,9,20,.97)";
+      nav.style.borderBottom = "1px solid rgba(255,255,255,.1)";
+    }
+  }
+
+  function subscribe(event) {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+    alert("Merci ! " + email + " a bien été enregistré. Branche ensuite ce formulaire à ton outil de newsletter.");
+  }
+</script>
+
+</body>
+</html>
