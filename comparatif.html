@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Comparatif des fournisseurs GPU pour CloudistePAD : prix, devise, localisation et compatibilité Sunshine/Moonlight, vérifiés le 24 novembre 2026.">
+  <title>CloudistePAD - Comparatif GPU</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-soft: #131a30;
+      --card: #18213a;
+      --text: #e8ecf8;
+      --muted: #9aa6c4;
+      --accent: #6ee7b7;
+      --accent-2: #818cf8;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(129, 140, 248, 0.18), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(110, 231, 183, 0.14), transparent 35%),
+        var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+
+    .wrap {
+      width: min(1100px, 92%);
+      margin-inline: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 1.2rem;
+      white-space: nowrap;
+    }
+
+    .brand .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px var(--accent);
+    }
+
+    nav { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.95rem; }
+    nav a { color: var(--muted); }
+    nav a:hover { color: var(--text); }
+
+    .hero { padding: 5rem 0 3rem; max-width: 820px; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.85rem;
+      background: rgba(110, 231, 183, 0.06);
+      margin-bottom: 1.4rem;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin: 0 0 1.2rem;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 0 2rem;
+    }
+
+    section { padding: 3rem 0; border-top: 1px solid var(--border); }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      letter-spacing: -0.03em;
+      margin: 0 0 1rem;
+    }
+
+    h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.8rem;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--bg-soft));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem;
+    }
+
+    .card p { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.96rem; }
+    .card p:last-child { margin-bottom: 0; }
+    .card p strong { color: var(--text); }
+
+    .note {
+      border-left: 3px solid var(--accent-2);
+      padding: 1rem 1.2rem;
+      background: rgba(129, 140, 248, 0.07);
+      border-radius: 0 12px 12px 0;
+      color: var(--muted);
+      margin: 1.5rem 0;
+    }
+
+    .note strong, .note p strong { color: var(--text); }
+    .note p:last-child { margin-bottom: 0; }
+
+    .note.green {
+      border-left-color: var(--accent);
+      background: rgba(110, 231, 183, 0.07);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .table-wide { min-width: 1020px; }
+    .table-small { min-width: 520px; }
+
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--accent);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    td:first-child { font-weight: 700; }
+    td small { color: var(--muted); }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .tag.ok { color: var(--accent); background: rgba(110, 231, 183, 0.08); border-color: rgba(110, 231, 183, 0.35); }
+    .tag.info { color: var(--accent-2); background: rgba(129, 140, 248, 0.08); border-color: rgba(129, 140, 248, 0.35); }
+    .tag.warn { color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.35); }
+    .tag.bad { color: #fca5a5; background: rgba(252, 165, 165, 0.08); border-color: rgba(252, 165, 165, 0.35); }
+
+    ul.clean, ol.steps { padding-left: 1.2rem; color: var(--muted); }
+    ul.clean li, ol.steps li { margin-bottom: 0.55rem; }
+    ul.clean li:last-child, ol.steps li:last-child { margin-bottom: 0; }
+
+    .verdict {
+      border-top: 1px solid var(--border);
+      padding-top: 0.7rem;
+      margin-top: 0.9rem !important;
+      color: var(--text) !important;
+      font-size: 0.9rem !important;
+    }
+
+    pre {
+      background: #070b16;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      color: #d7e2ff;
+      font-size: 0.92rem;
+    }
+
+    pre.message { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      nav { display: none; }
+      .hero { padding-top: 3.5rem; }
+      .card { padding: 1.1rem; }
+    }
+  </style>
+  <script defer data-domain="cloudiste.fr" src="https://plausible.codewithadu.de/js/script.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><span class="dot"></span> CloudistePAD</div>
+      <nav>
+        <a href="index.html">Accueil</a>
+        <a href="#besoins">Besoins</a>
+        <a href="#comparatif">Comparatif</a>
+        <a href="#analyse">Analyse</a>
+        <a href="#configuration">Configuration</a>
+        <a href="#budget">Budget</a>
+        <a href="#checklist">Checklist</a>
+        <a href="#sources">Sources</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="badge">Prix vérifiés le 24 novembre 2026</div>
+        <h1>Comparatif des fournisseurs <span>GPU</span></h1>
+        <p class="lead">
+          Quel hébergeur pour faire tourner CloudistePAD ? Ce comparatif confronte les offres
+          publiques à un usage réel : quelques heures par semaine, du 1080p/60 FPS, un budget
+          de 0,10 à 0,30 €/h, et une préférence pour un fournisseur européen facturant en euros.
+        </p>
+        <div class="note green">
+          <p><strong>Conclusion rapide :</strong> aucun fournisseur vérifié ne coche avec certitude les quatre cases à la fois — VM complète compatible CloudistePAD, GPU adapté au jeu, ports UDP Sunshine ouverts et facturation en euros sous 0,30 €/h.</p>
+          <p>Le meilleur candidat économique à tester est <strong>Vast.ai ou TensorDock</strong>, sous réserve de sélectionner une vraie VM et de vérifier le réseau. Pour une facturation européenne en euros, <strong>HOSTKEY</strong> mérite une demande de devis, mais ses offres GPU GeForce publiées sont surtout mensuelles et certaines sont indiquées « Pre-Order ».</p>
+        </div>
+      </div>
+
+      <section id="besoins">
+        <h2>Ce dont CloudistePAD a réellement besoin</h2>
+        <p class="lead">CloudistePAD s'appuie sur Sunshine côté serveur et Moonlight côté client. Ce n'est pas simplement une tâche d'inférence IA : il faut une machine utilisable comme un PC de jeu distant.</p>
+        <h3>Conditions techniques à exiger</h3>
+        <ul class="clean">
+          <li>VM complète x86_64/amd64, pas seulement un conteneur managé.</li>
+          <li>Ubuntu 22.04 ou 24.04.</li>
+          <li>GPU NVIDIA avec pilote fonctionnel sur l'hôte.</li>
+          <li><code>nvidia-smi</code> fonctionnel et NVIDIA Container Toolkit utilisable dans Docker.</li>
+          <li>Docker et Docker Compose.</li>
+          <li>Accès root ou sudo et SSH.</li>
+          <li>IPv4 publique, ou VPN privé correctement configuré.</li>
+          <li>Ports entrants TCP : <code>47984</code>, <code>47989</code>, <code>47990</code>, <code>48010</code>.</li>
+          <li>Ports entrants UDP : <code>47998</code>, <code>47999</code>, <code>48000</code>, <code>48002</code>.</li>
+          <li>Latence réseau faible et débit montant stable.</li>
+          <li>Stockage persistant si l'on veut conserver Steam, les jeux et les réglages entre les sessions.</li>
+        </ul>
+        <div class="note">
+          <p><strong>GPU recommandé pour 1080p60 :</strong> une GeForce RTX 3060 ou mieux. Une RTX 3090 est largement suffisante, mais probablement excessive pour cet objectif. La compatibilité du GPU et de son encodeur NVENC doit être vérifiée sur l'offre exacte.</p>
+        </div>
+      </section>
+
+      <section id="comparatif">
+        <h2>Tableau comparatif</h2>
+        <p class="lead">Les prix ci-dessous sont des repères publics relevés, pas des devis garantis. Les prix marketplace varient selon l'hôte, la région et la disponibilité. Le coût total doit inclure CPU, RAM, disque, réseau, taxes et éventuels frais de stockage.</p>
+        <div class="table-scroll">
+          <table class="table-wide">
+            <thead>
+              <tr>
+                <th>Fournisseur</th>
+                <th>Type d'offre</th>
+                <th>GPU repérés</th>
+                <th>Prix indicatif</th>
+                <th>Devise</th>
+                <th>Europe</th>
+                <th>Compatibilité CloudistePAD</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a href="https://vast.ai/">Vast.ai</a></td>
+                <td>Marketplace de machines GPU</td>
+                <td>Variable, selon hôte ; parfois GeForce RTX</td>
+                <td>Variable, offres à comparer en direct</td>
+                <td>USD</td>
+                <td>Selon hôte</td>
+                <td><span class="tag ok">Candidat</span><br><small>Choisir une VM Ubuntu complète, vérifier ports et persistance.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://tensordock.com/">TensorDock</a></td>
+                <td>Marketplace / VM GPU</td>
+                <td>RTX 3090 et autres selon disponibilité</td>
+                <td>RTX 3090 autour de 0,20 $/h GPU seul sur comparateurs ; total VM supérieur</td>
+                <td>USD</td>
+                <td>Certaines offres européennes</td>
+                <td><span class="tag ok">Candidat</span><br><small>Vérifier VM, IP publique, UDP et stockage.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://hostkey.com/gpu-dedicated-servers/vds-gpu/">HOSTKEY</a></td>
+                <td>VDS GPU / serveur virtuel</td>
+                <td>RTX 3090, RTX A5000, RTX 4090 selon catalogue</td>
+                <td>3090 : 209 €/mois ; A5000 : 179 €/mois ; 4090 : 299 €/mois, certaines offres « Pre-Order »</td>
+                <td>EUR</td>
+                <td>Oui, plusieurs sites européens selon offre</td>
+                <td><span class="tag info">Techniquement prometteur</span><br><small>Mais trop cher pour quelques heures/semaine si facturé au mois ; vérifier disponibilité et UDP.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.scaleway.com/en/gpu-instances/">Scaleway</a></td>
+                <td>Cloud public GPU</td>
+                <td>L4, L40S, H100 et autres</td>
+                <td>L4 autour de 0,79 €/h</td>
+                <td>EUR</td>
+                <td>Paris, Varsovie selon modèle</td>
+                <td><span class="tag warn">À vérifier</span><br><small>VM cloud possible, mais cher et GPU datacenter ; vérifier affichage/virtualisation et ports.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.ovhcloud.com/">OVHcloud</a></td>
+                <td>Cloud public GPU</td>
+                <td>L4, L40S, A100/H100 selon région</td>
+                <td>L4 autour de 0,75 €/h</td>
+                <td>EUR</td>
+                <td>France et autres régions selon gamme</td>
+                <td><span class="tag warn">À vérifier</span><br><small>VM possible, mais largement hors budget ; attention à la facturation des instances arrêtées.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.runpod.io/">RunPod</a></td>
+                <td>Pods GPU, cloud GPU et serverless</td>
+                <td>RTX 3090 et autres selon région</td>
+                <td>Variable, généralement en USD</td>
+                <td>USD</td>
+                <td>Plusieurs régions européennes selon offre</td>
+                <td><span class="tag bad">À écarter</span><br><small>Tant que les contraintes UDP/VM ne sont pas validées ; le README CloudistePAD signale les Pods/Serverless comme incompatibles.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://clore.ai/">Clore.ai</a></td>
+                <td>Marketplace de GPU</td>
+                <td>Variable selon hôtes</td>
+                <td>Variable, généralement crypto / USD selon parcours</td>
+                <td>Crypto / USD</td>
+                <td>Selon hôte</td>
+                <td><span class="tag warn">À vérifier</span><br><small>Ne pas supposer qu'une offre conteneurisée fournit une VM complète et les ports requis.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://vramfarm.com/">VRAMfarm</a></td>
+                <td>Location GPU avec environnements et applications prêts à l'emploi</td>
+                <td>Variable selon catalogue</td>
+                <td>Tarifs variables, souvent à la minute</td>
+                <td>EUR</td>
+                <td>Certaines machines européennes</td>
+                <td><span class="tag bad">Non adapté en l'état</span><br><small>Si l'offre est un conteneur isolé dont le disque est supprimé à l'arrêt ; pas l'équivalent d'une VM persistante.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.hetzner.com/">Hetzner</a></td>
+                <td>Serveurs dédiés GPU</td>
+                <td>RTX PRO 4000/6000 selon gamme</td>
+                <td>Environ 0,34 €/h pour RTX PRO 4000, avec frais d'installation élevés selon modèle</td>
+                <td>EUR</td>
+                <td>Allemagne / Finlande selon serveur</td>
+                <td><span class="tag warn">Hors budget</span><br><small>VM/serveur complet possible, mais au-dessus du budget et matériel orienté workstation.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://www.infomaniak.com/">Infomaniak</a></td>
+                <td>Cloud GPU</td>
+                <td>L4, L40S, A100 selon offre et disponibilité</td>
+                <td>Offres L4 signalées autour de 0,25 €/h, à confirmer directement</td>
+                <td>CHF / EUR selon facturation</td>
+                <td>Suisse</td>
+                <td><span class="tag info">Piste à contacter</span><br><small>Confirmer que l'offre est une VM complète, qu'elle accepte Sunshine et que le prix final est bien en euros.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://salad.com/">SaladCloud</a></td>
+                <td>Calcul GPU distribué / conteneurs</td>
+                <td>RTX 3080 Ti, 3090, 4080 selon disponibilité</td>
+                <td>Environ 0,20–0,27 $/h GPU sur comparateurs</td>
+                <td>USD</td>
+                <td>Selon capacité</td>
+                <td><span class="tag bad">Pas un choix sûr</span><br><small>Sans preuve d'une VM complète, d'une IP publique et des ports UDP entrants.</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--muted); font-size: 0.9rem;">Paperspace est également analysé ci-dessous (vraie VM persistante, région d'Amsterdam, mais hors budget) : il ne figurait pas dans le tableau source.</p>
+
+        <h3 style="margin-top: 2rem;">Lecture du tableau</h3>
+        <ul class="clean">
+          <li><strong>Meilleures pistes à petit budget :</strong> Vast.ai et TensorDock, parce que les marketplaces peuvent proposer des GeForce à prix compétitif.</li>
+          <li><strong>Meilleure piste de facturation en euros :</strong> HOSTKEY pour des VDS GPU GeForce, mais les prix mensuels dépassent ton budget d'usage occasionnel. Infomaniak mérite une vérification directe, sans garantie de compatibilité gaming.</li>
+          <li><strong>Solutions cloud datacenter :</strong> Scaleway et OVHcloud sont solides pour des VM GPU, mais leurs tarifs GPU relevés dépassent ton plafond de 0,30 €/h.</li>
+          <li><strong>Offres conteneurisées :</strong> elles ne sont pas interchangeables avec une VM gaming. Une image Docker avec GPU ne suffit pas à faire fonctionner un bureau complet, Steam, Sunshine et les connexions Moonlight.</li>
+        </ul>
+      </section>
+
+      <section id="analyse">
+        <h2>Analyse des candidats les plus pertinents</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>A. Vast.ai <span class="tag ok">Meilleur potentiel de prix</span></h3>
+            <p><strong>Pourquoi le considérer :</strong> marketplace où le prix et le matériel varient selon les hôtes ; possibilité de trouver des GPU GeForce adaptés au jeu ; le dépôt CloudistePAD recommande une VM Ubuntu, et non une instance Docker seule.</p>
+            <p><strong>Risques :</strong> qualité, réseau et disponibilité dépendants de l'hôte ; ports publics parfois remappés ou limités (Tailscale peut contourner le problème) ; tarification en dollars ; vérifier le coût total, stockage et réseau inclus ; arrêter le conteneur ne signifie pas forcément arrêter la facturation de la VM.</p>
+            <p class="verdict"><strong>Verdict :</strong> premier candidat à tester si le prix prime sur la facturation en euros. Ne louer qu'après avoir vérifié les ports et la nature exacte de l'instance.</p>
+          </div>
+
+          <div class="card">
+            <h3>B. TensorDock <span class="tag ok">À comparer avec Vast.ai</span></h3>
+            <p><strong>Pourquoi le considérer :</strong> déploiement de VM GPU et choix de ressources ; présence d'offres GeForce, notamment RTX 3090 selon disponibilité ; facturation au prorata annoncée par la plateforme.</p>
+            <p><strong>Risques :</strong> prix affichés en dollars ; offre dépendante de l'hôte et de la région ; vérifier VM complète, SSH/root, IP publique et ports UDP entrants ; confirmer la persistance du disque et le coût à l'arrêt.</p>
+            <p class="verdict"><strong>Verdict :</strong> deuxième candidat à mettre en concurrence avec Vast.ai. Le prix « GPU seul » n'est pas le prix final de la VM.</p>
+          </div>
+
+          <div class="card">
+            <h3>C. HOSTKEY <span class="tag info">Intéressant pour l'euro</span></h3>
+            <p><strong>Catalogue public relevé :</strong> RTX 3090 24 Go ≈ 209 €/mois ; RTX A5000 24 Go ≈ 179 €/mois ; RTX 4090 24 Go ≈ 299 €/mois. Plusieurs configurations sont indiquées « Pre-Order ».</p>
+            <p><strong>Risques :</strong> offres plus proches d'un serveur GPU permanent que d'une location occasionnelle ; vérifier si une vraie option horaire existe ; selon les conditions publiées, éteindre la machine ne met pas forcément fin à la facturation et la résiliation peut détruire le serveur.</p>
+            <p class="verdict"><strong>Verdict :</strong> pas mon choix pour un usage de quelques heures par semaine au budget annoncé.</p>
+          </div>
+
+          <div class="card">
+            <h3>D. Scaleway et OVHcloud <span class="tag warn">Hors budget</span></h3>
+            <p>Les tarifs publics relevés pour les GPU L4 sont de l'ordre de 0,75 à 0,79 €/h, soit environ 2,5 fois ou plus ton plafond horaire. Ce sont des GPU datacenter, pas nécessairement le meilleur choix pour un PC gaming distant.</p>
+            <p>Ils restent intéressants si tu privilégies un cloud européen avec facturation en euros et acceptes un budget supérieur.</p>
+            <p class="verdict"><strong>Verdict :</strong> écarter pour le budget actuel.</p>
+          </div>
+
+          <div class="card">
+            <h3>F. Paperspace <span class="tag info">VM persistante, mais chère</span></h3>
+            <p>Paperspace (désormais documenté dans l'écosystème DigitalOcean) propose <strong>Machines</strong>, une vraie VM Linux ou Windows avec GPU, stockage persistant, IP publique possible et accès SSH. La région d'Amsterdam (AMS1) est intéressante depuis la France. <a href="https://docs.digitalocean.com/products/paperspace/">Documentation</a> · <a href="https://github.com/Paperspace/CORE-API-Docs/blob/master/api-documentation/machines/README.md">Régions</a></p>
+            <p><strong>Tarifs GPU horaires publiés</strong> (USD, hors stockage et IP) : M4000 0,45 $/h · P4000 0,51 $/h · RTX4000 0,56 $/h · P5000 0,78 $/h · A4000 0,76 $/h · A5000 1,38 $/h. Même le moins cher dépasse le plafond de 0,30 €/h avant conversion. <a href="https://docs.digitalocean.com/products/paperspace/pricing/">Tarifs officiels</a></p>
+            <p><strong>Points positifs :</strong> VM complète, stockage persistant, SSH, IP publique, latence correcte depuis la France ; le calcul GPU s'arrête à l'extinction, mais stockage et IP continuent d'être facturés. <a href="https://docs.digitalocean.com/products/paperspace/machines/how-to/manage-public-ips/">Gestion des IP</a></p>
+            <p><strong>Points de vigilance :</strong> facturation en USD ; GPU workstation/datacenter plutôt que GeForce ; templates Windows dépréciés pour les nouveaux utilisateurs ; ouverture des ports UDP Sunshine non confirmée officiellement ; offre orientée HPC/IA plutôt que gaming cloud.</p>
+            <p class="verdict"><strong>Verdict :</strong> solution de repli pour un test, pas recommandation principale.</p>
+          </div>
+
+          <div class="card">
+            <h3>E. RunPod, Clore.ai, VRAMfarm et SaladCloud <span class="tag bad">À écarter sans preuve</span></h3>
+            <p>Ces services peuvent être intéressants pour louer de la puissance GPU, lancer des conteneurs ou exécuter des applications IA. Mais CloudistePAD demande un environnement de PC distant avec accès réseau entrant et une VM suffisamment complète : il faut examiner le produit exact, et pas seulement la présence d'un GPU NVIDIA.</p>
+            <p class="verdict"><strong>Verdict :</strong> ne pas les retenir sans confirmation explicite d'une VM complète, de l'accès réseau Sunshine et de la persistance.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="configuration">
+        <h2>Configuration cible à demander</h2>
+        <p class="lead">Pour du 1080p60 avec quelques heures de jeu par semaine :</p>
+        <div class="table-scroll">
+          <table class="table-small">
+            <thead>
+              <tr>
+                <th>Ressource</th>
+                <th>Minimum raisonnable</th>
+                <th>Cible conseillée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>GPU</td><td>RTX 3060 12 Go</td><td>RTX 3060 12 Go ou RTX 3090 si l'offre est très économique</td></tr>
+              <tr><td>CPU</td><td>4 vCPU</td><td>6 vCPU</td></tr>
+              <tr><td>RAM</td><td>8 Go</td><td>16 Go</td></tr>
+              <tr><td>Disque</td><td>100 Go SSD</td><td>150–200 Go NVMe</td></tr>
+              <tr><td>OS</td><td>Ubuntu 22.04 amd64</td><td>Ubuntu 22.04/24.04 amd64</td></tr>
+              <tr><td>Réseau</td><td>IPv4 publique</td><td>IPv4 publique, faible latence, UDP entrant</td></tr>
+              <tr><td>Accès</td><td>SSH</td><td>Root/sudo + SSH</td></tr>
+              <tr><td>Conteneurs</td><td>Docker</td><td>Docker + Docker Compose + NVIDIA Container Toolkit</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <p><strong>Important :</strong> la RTX 3090 est un bon GPU gaming, mais elle consomme davantage et peut coûter plus cher. Pour du 1080p60, une RTX 3060 ou une carte de niveau similaire suffit généralement. Il vaut mieux payer pour une bonne connexion réseau et un hôte stable que pour un GPU surdimensionné.</p>
+        </div>
+      </section>
+
+      <section id="budget">
+        <h2>Budget correspondant à ton utilisation</h2>
+        <p class="lead">Budget de 0,10 à 0,30 €/h. Voici le coût de calcul pur, hors stockage, taxes, réseau et éventuels frais fixes :</p>
+        <div class="table-scroll">
+          <table class="table-small">
+            <thead>
+              <tr>
+                <th>Utilisation</th>
+                <th>À 0,10 €/h</th>
+                <th>À 0,20 €/h</th>
+                <th>À 0,30 €/h</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>4 h/semaine (~17,3 h/mois)</td><td>1,73 €</td><td>3,46 €</td><td>5,19 €</td></tr>
+              <tr><td>6 h/semaine (~26 h/mois)</td><td>2,60 €</td><td>5,20 €</td><td>7,80 €</td></tr>
+              <tr><td>8 h/semaine (~34,7 h/mois)</td><td>3,47 €</td><td>6,94 €</td><td>10,41 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          <p>À ce niveau d'utilisation, un abonnement mensuel de 179 à 299 € n'a pas de sens économique. Il faut privilégier une location réellement facturée à l'heure ou à la seconde, avec stockage persistant à coût raisonnable.</p>
+        </div>
+      </section>
+
+      <section id="checklist">
+        <h2>Checklist avant de louer</h2>
+        <p class="lead">Envoyer ces questions au fournisseur ou à l'hôte avant tout paiement :</p>
+        <ol class="steps">
+          <li>Est-ce une <strong>VM complète</strong> (et non un simple conteneur) avec Ubuntu 22.04/24.04 amd64 ?</li>
+          <li>Ai-je accès à SSH et root/sudo ?</li>
+          <li>Le pilote NVIDIA est-il installé et <code>nvidia-smi</code> fonctionne-t-il ?</li>
+          <li>Puis-je installer Docker Compose et NVIDIA Container Toolkit ?</li>
+          <li>L'adresse IPv4 est-elle publique et dédiée à mon instance ?</li>
+          <li>Les ports TCP <code>47984</code>, <code>47989</code>, <code>47990</code>, <code>48010</code> sont-ils accessibles depuis Internet ?</li>
+          <li>Les ports UDP <code>47998</code>, <code>47999</code>, <code>48000</code>, <code>48002</code> sont-ils accessibles depuis Internet, sans filtrage ?</li>
+          <li>Le disque système et les jeux Steam restent-ils conservés après arrêt/redémarrage ?</li>
+          <li>Quel est le coût total avec 6 vCPU, 16 Go RAM, 150–200 Go NVMe et IPv4 ?</li>
+          <li>Quel est le coût exact lorsque la VM est arrêtée ? Le stockage et l'adresse IP restent-ils facturés ?</li>
+          <li>La facturation est-elle réellement en euros, avec facture et TVA adaptées à mon pays ?</li>
+          <li>Puis-je tester pendant une heure et résilier sans frais ni engagement ?</li>
+        </ol>
+
+        <h3 style="margin-top: 2rem;">Message prêt à envoyer au support</h3>
+        <pre class="message">Bonjour,
+
+Je souhaite louer une machine pour du cloud gaming avec CloudistePAD,
+Sunshine et Moonlight.
+
+Je cherche une VM complète Ubuntu 22.04/24.04 amd64, avec GPU NVIDIA
+(idéalement RTX 3060 12 Go ou équivalent), 6 vCPU, 16 Go de RAM,
+150–200 Go NVMe, accès root/SSH et IPv4 publique.
+
+Pouvez-vous confirmer que je peux installer Docker Compose et NVIDIA
+Container Toolkit, et que les ports TCP 47984, 47989, 47990, 48010
+ainsi que UDP 47998, 47999, 48000 et 48002 sont accessibles depuis
+Internet ?
+
+Le disque et les jeux restent-ils persistants après arrêt de la VM ?
+Quel est le coût total horaire, stockage et IPv4 compris, et quelle
+facturation s'applique lorsque la VM est arrêtée ?
+
+Je privilégie une facturation en euros et une localisation en Europe.
+
+Merci.</pre>
+      </section>
+
+      <section id="sources">
+        <h2>Sources et liens à vérifier</h2>
+        <ul class="clean">
+          <li><a href="https://github.com/nazimboudeffa/cloudiste-pad">CloudistePAD — dépôt GitHub</a></li>
+          <li><a href="https://vast.ai/">Vast.ai — marketplace</a> · <a href="https://vast.ai/article/how-much-does-it-cost-to-rent-a-gpu-in-the-cloud-live-pricing-guide">guide de tarification GPU</a></li>
+          <li><a href="https://console.tensordock.com/deploy">TensorDock — déployer une VM GPU</a></li>
+          <li><a href="https://hostkey.com/gpu-dedicated-servers/vds-gpu/">HOSTKEY — VDS GPU</a></li>
+          <li><a href="https://www.scaleway.com/en/gpu-instances/">Scaleway — GPU Instances</a></li>
+          <li><a href="https://www.ovhcloud.com/">OVHcloud — Public Cloud</a></li>
+          <li><a href="https://www.runpod.io/">RunPod</a> · <a href="https://clore.ai/">Clore.ai</a> · <a href="https://vramfarm.com/">VRAMfarm</a></li>
+          <li><a href="https://www.hetzner.com/">Hetzner</a> · <a href="https://www.infomaniak.com/">Infomaniak</a> · <a href="https://salad.com/">SaladCloud</a></li>
+          <li><a href="https://vramfarm.com/fr/blog/gpu-cloud-europe/">Panorama des GPU cloud en Europe — tarifs et régions</a></li>
+          <li><a href="https://vramfarm.com/en/compare/">Comparatif de fournisseurs GPU cloud</a> · <a href="https://www.gpuradar.eu/hosting">GPU Radar — offres GPU en Europe</a></li>
+        </ul>
+        <div class="note">
+          <p><strong>Note Paperspace :</strong> les prix GPU cités proviennent du barème officiel publié par Paperspace/DigitalOcean et sont en USD. La facturation GPU s'arrête à l'extinction de la machine, mais stockage et IP restent facturés tant qu'ils sont attachés.</p>
+          <p><strong>Note méthodologique :</strong> les pages de comparaison et les catalogues évoluent rapidement. Les prix sont des instantanés et certains comparateurs ne donnent que le prix du GPU, pas celui de la machine complète. Les points décisifs pour CloudistePAD — VM complète, ports UDP entrants, persistance et latence — doivent être confirmés auprès du fournisseur avant paiement.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Cloudiste PAD — comparatif GPU pour un cloud gaming perso.</span>
+      <span><a href="index.html">Retour à l'accueil</a> · Source : <code>comparatif-fournisseurs-gpu.md</code></span>
+    </footer>
+  </div>
+</body>
+</html>
