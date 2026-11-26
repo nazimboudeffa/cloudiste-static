@@ -247,18 +247,22 @@
     .note.red p { margin: 0; }
     .note strong { color: var(--text); }
 
-    pre {
+    .copyable {
       position: relative;
       background: #070b16;
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 1.2rem;
+      margin: 1em 0;
+      padding-top: 3.2rem;
+    }
+
+    .copyable pre {
+      margin: 0;
+      padding: 0 1.2rem 1.2rem;
       overflow-x: auto;
       color: #d7e2ff;
       font-size: 0.95rem;
     }
-
-    pre.copyable { padding-top: 3.2rem; }
 
     .copy-button {
       position: absolute;
@@ -400,7 +404,10 @@
       <section id="demarrage">
         <h2>Démarrage rapide</h2>
         <p class="lead">Sur une VM Ubuntu complète (x86_64) avec accès SSH/root et driver NVIDIA déjà installé :</p>
-        <pre class="copyable"><button class="copy-button" type="button" aria-label="Copier le code" aria-live="polite">Copier</button><code>curl -fsSL https://raw.githubusercontent.com/nazimboudeffa/cloudiste-pad/main/deploy.sh -o deploy.sh && bash deploy.sh deploy</code></pre>
+        <div class="copyable">
+          <button class="copy-button" type="button" aria-label="Copier le code" aria-live="polite">Copier</button>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/nazimboudeffa/cloudiste-pad/main/deploy.sh -o deploy.sh && bash deploy.sh deploy</code></pre>
+        </div>
         <ol class="steps">
           <li>Connecte la VM et ton PC au même réseau <a href="https://tailscale.com/">Tailscale</a>.</li>
           <li>Récupère l’IP avec <code>tailscale ip -4</code>.</li>
@@ -419,7 +426,7 @@
     </footer>
   </div>
   <script>
-    document.querySelectorAll("pre.copyable").forEach((block) => {
+    document.querySelectorAll(".copyable").forEach((block) => {
       const button = block.querySelector(".copy-button");
       const code = block.querySelector("code");
       let resetTimer;
