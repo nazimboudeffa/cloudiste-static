@@ -331,7 +331,6 @@
 
     table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
     .table-wide { min-width: 900px; }
-    .table-summary { min-width: 780px; }
 
     th, td {
       padding: 0.8rem 1rem;
@@ -389,6 +388,29 @@
 
     .tag.ok { color: var(--accent); background: rgba(110, 231, 183, 0.08); border-color: rgba(110, 231, 183, 0.35); }
     .tag.warn { color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.35); }
+
+    /* Lignes-groupes du tableau fusionné : un GPU par groupe, dépliable. */
+    tr.group-row th {
+      background: rgba(129, 140, 248, 0.07);
+      border-bottom: 1px solid var(--border);
+      font-weight: 400;
+    }
+
+    tr.group-row:hover th { background: rgba(129, 140, 248, 0.12); }
+
+    .group-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .group-toggle::after { content: none; }
+    .group-toggle .chevron { color: var(--accent); width: 1em; display: inline-block; }
+    .group-row .tag, .group-row small { margin-left: 0.6rem; }
+    tbody.group tr.offer-row td:first-child { padding-left: 2rem; border-left: 2px solid rgba(110, 231, 183, 0.25); }
+    tr.no-results td { text-align: center; color: var(--muted); padding: 2rem; }
 
     .toolbar {
       display: grid;
@@ -520,41 +542,9 @@
         </div>
       </div>
 
-      <section id="summary">
-        <h2>Prix plancher par GPU</h2>
-        <p class="lead">Le prix le plus bas observé pour chaque modèle, toutes offres confondues.</p>
-
-        <div class="stats">
-          <div class="stat"><span class="label">Offres relevées</span><span class="value" id="stat-offres">—</span></div>
-          <div class="stat"><span class="label">Modèles GPU</span><span class="value" id="stat-gpus">—</span></div>
-          <div class="stat"><span class="label">Fournisseurs</span><span class="value" id="stat-providers">—</span></div>
-          <div class="stat">
-            <span class="label">Meilleur prix</span>
-            <span class="value" id="stat-best">—</span>
-            <small id="stat-best-note"></small>
-          </div>
-        </div>
-
-        <div class="table-scroll">
-          <table class="table-summary">
-            <thead>
-              <tr>
-                <th>GPU</th>
-                <th>Prix plancher</th>
-                <th>Prix moyen</th>
-                <th>Fournisseurs</th>
-                <th>Offres</th>
-                <th>Meilleure offre</th>
-              </tr>
-            </thead>
-            <tbody id="summary-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="offres">
-        <h2>Toutes les offres</h2>
-        <p class="lead">Filtrez par modèle, fournisseur, lieu ou prix, puis cliquez sur un en-tête pour trier.</p>
+      <section id="market">
+        <h2>Prix des GPU en France</h2>
+        <p class="lead">Filtrez par modèle, fournisseur, lieu ou prix, puis cliquez sur une ligne GPU pour déplier ses offres. Cliquez sur un en-tête pour trier.</p>
 
         <div class="note warn" id="demo-banner" hidden>
           <p><strong>Aperçu de démonstration : ces prix sont fictifs.</strong> Remplacez-les par vos propres données avec <code>scan_gpu.py</code>.</p>
@@ -586,14 +576,30 @@
           </div>
           <div class="toolbar-actions">
             <button class="btn" type="button" id="refresh">Actualiser</button>
+            <button class="btn" type="button" id="expand-all" aria-expanded="false">Tout déplier</button>
             <button class="btn" type="button" id="reset">Réinitialiser les filtres</button>
           </div>
         </div>
 
         <div class="status" id="status" role="status" aria-live="polite">Chargement des offres…</div>
 
-        <div class="table-scroll" id="offers-wrap">
-          <table class="table-wide">
+        <div class="stats" id="summary">
+          <div class="stat">
+            <span class="label">Offres affichées</span>
+            <span class="value" id="stat-offres">—</span>
+            <small id="stat-offres-note"></small>
+          </div>
+          <div class="stat"><span class="label">Modèles GPU</span><span class="value" id="stat-gpus">—</span></div>
+          <div class="stat"><span class="label">Fournisseurs</span><span class="value" id="stat-providers">—</span></div>
+          <div class="stat">
+            <span class="label">Meilleur prix</span>
+            <span class="value" id="stat-best">—</span>
+            <small id="stat-best-note"></small>
+          </div>
+        </div>
+
+        <div class="table-scroll" id="offres">
+          <table class="table-wide" id="market-table">
             <thead>
               <tr>
                 <th><button type="button" data-sort="gpu">GPU</button></th>
@@ -606,7 +612,6 @@
                 <th><button type="button" data-sort="stock">Dispo.</button></th>
               </tr>
             </thead>
-            <tbody id="offers-body"></tbody>
           </table>
         </div>
 
@@ -629,7 +634,7 @@
 
         <div class="note">
           <p><strong>Méthode :</strong> prix par GPU et par heure, hors CPU, RAM, disque, réseau, taxes et frais de stockage. Le script ne retient que les offres disponibles à la demande dont la machine est en France.</p>
-          <p>Les noms de GPU renvoient vers l’offre du fournisseur : déploiement Runpod pré-rempli ou marketplace Vast.ai. Dans le tableau récapitulatif, le lien pointe vers l’offre la moins chère du modèle.</p>
+          <p>Chaque ligne GPU affiche le prix plancher, le prix moyen et le nombre d’offres <strong>sur les offres filtrées</strong> ; dépliez-la pour voir le détail. Les noms de GPU renvoient vers l’offre du fournisseur : déploiement Runpod pré-rempli ou marketplace Vast.ai, sur l’offre la moins chère du modèle.</p>
           <p>Les offres marketplace changent vite : vérifiez toujours le prix final, la VM complète, l’accès SSH, les ports UDP de Sunshine et la persistance du disque avant de louer.</p>
         </div>
       </section>
@@ -683,6 +688,8 @@
       let currency = "usd";
       let sortKey = "price";
       let sortDir = "asc";
+      let expandedGroups = new Set();
+      let currentGroups = [];
 
       const $ = (id) => document.getElementById(id);
 
@@ -748,6 +755,10 @@
       function priceOf(o) {
         if (currency === "usd") return o.usd_gpu_h;
         return o.eur_gpu_h === null ? o.usd_gpu_h * EUR_RATE : o.eur_gpu_h;
+      }
+
+      function plural(count, singular, multiple) {
+        return count === 1 ? singular : multiple;
       }
 
       function fmt(value) {
@@ -855,30 +866,62 @@
         if (noteNode) noteNode.textContent = noteText;
       }
 
-      function makeGroups() {
+      function makeGroups(list) {
         const map = new Map();
-        offers.forEach((o) => {
+        list.forEach((o) => {
           const key = keyOf(o.gpu);
-          if (!map.has(key)) map.set(key, { name: o.gpu, list: [] });
+          if (!map.has(key)) map.set(key, { key: key, name: o.gpu, list: [] });
           map.get(key).list.push(o);
         });
-        return Array.from(map.values()).sort((a, b) => {
-          const pa = Math.min.apply(null, a.list.map(priceOf));
-          const pb = Math.min.apply(null, b.list.map(priceOf));
-          return pa - pb || a.name.localeCompare(b.name, "fr");
+        const groups = Array.from(map.values());
+        const groupValue = (g) => sortKey === "gpu"
+          ? g.key
+          : Math.min.apply(null, g.list.map(priceOf));
+        const direction = (sortKey === "gpu" || sortKey === "price") ? sortDir : "asc";
+        groups.sort((a, b) => {
+          const va = groupValue(a);
+          const vb = groupValue(b);
+          const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb), "fr");
+          return direction === "asc" ? cmp : -cmp;
         });
+        return groups;
       }
 
-      function renderSummary(groups) {
-        const body = $("summary-body");
-        body.replaceChildren();
+      function renderSummary(groups, visible) {
+        currentGroups = groups;
 
-        const best = offers.reduce((acc, o) => (!acc || o.usd_gpu_h < acc.usd_gpu_h ? o : acc), null);
-        $("stat-offres").textContent = offers.length;
+        const best = visible.reduce((acc, o) => (!acc || priceOf(o) < priceOf(acc) ? o : acc), null);
+        $("stat-offres").textContent = visible.length;
+        $("stat-offres-note").textContent = visible.length === offers.length
+          ? "" : "sur " + offers.length + " offres au total";
         $("stat-gpus").textContent = groups.length;
-        $("stat-providers").textContent = new Set(offers.map(providerOf)).size;
+        $("stat-providers").textContent = new Set(visible.map(providerOf)).size;
         $("stat-best").textContent = best ? fmtPrice(priceOf(best)) : "—";
         $("stat-best-note").textContent = best ? best.gpu : "";
+
+        const table = $("market-table");
+        table.querySelectorAll("tbody").forEach((tbody) => tbody.remove());
+
+        if (!groups.length) {
+          const tbody = el("tbody");
+          const tr = el("tr", "no-results");
+          const td = el("td", null, "Aucune offre ne correspond à ces filtres.");
+          td.colSpan = 8;
+          const resetBtn = el("button", "btn", "Réinitialiser les filtres");
+          resetBtn.type = "button";
+          resetBtn.id = "empty-reset";
+          resetBtn.style.marginLeft = "1rem";
+          td.appendChild(resetBtn);
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          table.appendChild(tbody);
+          renderStatus(visible, 0);
+          updateExpandAll();
+          return;
+        }
+
+        const bestUsd = visible.reduce(
+          (acc, o) => (acc === null || o.usd_gpu_h < acc ? o.usd_gpu_h : acc), null);
 
         groups.forEach((group) => {
           const prices = group.list.map(priceOf);
@@ -886,20 +929,59 @@
           const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
           const bestOffer = group.list.find((o) => priceOf(o) === low);
           const providers = Array.from(new Set(group.list.map(providerOf)));
-          const tr = el("tr");
-          const tdGpu = el("td");
-          appendGpuLink(tdGpu, bestOffer);
-          tr.appendChild(tdGpu);
-          const tdLow = cell(tr, "price", fmtPrice(low));
-          tdLow.appendChild(el("span", "tag ok", "plancher"));
-          cell(tr, null, fmtPrice(avg));
-          const tdProviders = cell(tr, null, providers.length);
-          tdProviders.appendChild(el("small", null, providers.join(", ")));
-          cell(tr, null, group.list.length);
-          const tdBest = cell(tr, null, bestOffer.source);
-          tdBest.appendChild(el("small", null, bestOffer.lieu));
-          body.appendChild(tr);
+          const open = expandedGroups.has(group.key);
+
+          const tbody = el("tbody", "group");
+          const trGroup = el("tr", "group-row");
+          const th = el("th");
+          th.scope = "rowgroup";
+          th.colSpan = 8;
+          const toggle = el("button", "group-toggle");
+          toggle.type = "button";
+          toggle.dataset.group = group.key;
+          toggle.setAttribute("aria-expanded", String(open));
+          toggle.appendChild(el("span", "chevron", open ? "▾" : "▸"));
+          toggle.appendChild(document.createTextNode(gpuLabel(group.name)));
+          th.appendChild(toggle);
+          th.appendChild(el("span", "tag ok", "plancher " + fmtPrice(low)));
+          th.appendChild(el("small", null,
+            group.list.length + " " + plural(group.list.length, "offre", "offres")
+            + " · " + providers.length + " " + plural(providers.length, "fournisseur", "fournisseurs")
+            + " · moy. " + fmtPrice(avg)
+            + " · meilleure offre : " + bestOffer.source + " (" + bestOffer.lieu + ")"));
+          trGroup.appendChild(th);
+          tbody.appendChild(trGroup);
+
+          if (open) {
+            group.list.slice().sort(compareRows).forEach((o) => {
+              const tr = el("tr", "offer-row");
+              const tdGpu = el("td");
+              appendGpuLink(tdGpu, o);
+              tr.appendChild(tdGpu);
+              cell(tr, null, o.source);
+              const tdPrice = cell(tr, "price", fmtPrice(priceOf(o)));
+              if (bestUsd !== null && o.usd_gpu_h === bestUsd) {
+                tdPrice.appendChild(el("span", "tag ok", "meilleur prix"));
+              }
+              cell(tr, null, o.nb_gpu);
+              const tdConfig = cell(tr, null,
+                o.ram_go === null && o.vcpu === null ? "—" : (o.ram_go === null ? "—" : o.ram_go + " Go RAM"));
+              if (o.vcpu !== null) tdConfig.appendChild(el("small", null, o.vcpu + " vCPU"));
+              cell(tr, null, o.lieu);
+              cell(tr, null, o.type);
+              const tdStock = cell(tr, null, o.stock || "—");
+              if (o.stock && /low|scarce|few|faible/i.test(o.stock)) {
+                tdStock.appendChild(el("span", "tag warn", "stock limité"));
+              }
+              tbody.appendChild(tr);
+            });
+          }
+
+          table.appendChild(tbody);
         });
+
+        renderStatus(visible, groups.length);
+        updateExpandAll();
       }
 
       function fillSelect(select, values, allLabel) {
@@ -936,24 +1018,17 @@
         return Number.isFinite(value) ? value : Infinity;
       }
 
-      function renderStatus(count) {
-        const status = $("status");
-        status.replaceChildren();
-        status.appendChild(el("strong", null, count + " offres affichées"));
-        status.appendChild(el("span", null, new Set(offers.map(providerOf)).size + " fournisseurs"));
-        status.appendChild(el("span", null, demo ? "Aperçu fictif" : "Mise à jour : " + formatDate(updated)));
-        status.appendChild(el("span", null, demo ? "Données d’exemple" : "Source : scan_gpu.py"));
+      function hasFilters() {
+        return Boolean($("q").value.trim() || $("provider").value
+          || $("location").value || $("max-price").value.trim());
       }
 
-      function renderOffers() {
+      function visibleOffers() {
         const query = $("q").value.trim().toLowerCase();
         const provider = $("provider").value;
         const location = $("location").value;
         const ceiling = maxPrice();
-        const bestUsd = offers.reduce((acc, o) => (!acc || o.usd_gpu_h < acc ? o.usd_gpu_h : acc), Infinity);
-        const body = $("offers-body");
-
-        const rows = offers.filter((o) => {
+        return offers.filter((o) => {
           if (provider && providerOf(o) !== provider) return false;
           if (location && o.lieu !== location) return false;
           if (priceOf(o) > ceiling) return false;
@@ -961,42 +1036,42 @@
           return [o.gpu, o.source, o.lieu, o.type, o.stock]
             .some((field) => field.toLowerCase().indexOf(query) >= 0);
         });
+      }
 
-        rows.sort((a, b) => {
-          const va = valueFor(a, sortKey);
-          const vb = valueFor(b, sortKey);
-          const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb), "fr");
-          return sortDir === "asc" ? cmp : -cmp;
-        });
+      function compareRows(a, b) {
+        const va = valueFor(a, sortKey);
+        const vb = valueFor(b, sortKey);
+        const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb), "fr");
+        return sortDir === "asc" ? cmp : -cmp;
+      }
 
-        body.replaceChildren();
-        if (!rows.length) {
-          const tr = el("tr");
-          const td = el("td", null, "Aucune offre ne correspond à ces filtres.");
-          td.colSpan = 8;
-          tr.appendChild(td);
-          body.appendChild(tr);
-        }
+      function renderFiltered() {
+        const visible = visibleOffers();
+        renderSummary(makeGroups(visible), visible);
+      }
 
-        rows.forEach((o) => {
-          const tr = el("tr");
-          const tdGpu = el("td");
-          appendGpuLink(tdGpu, o);
-          tr.appendChild(tdGpu);
-          cell(tr, null, o.source);
-          const tdPrice = cell(tr, "price", fmtPrice(priceOf(o)));
-          if (o.usd_gpu_h === bestUsd) tdPrice.appendChild(el("span", "tag ok", "meilleur prix"));
-          cell(tr, null, o.nb_gpu);
-          const tdConfig = cell(tr, null, o.ram_go === null && o.vcpu === null ? "—" : (o.ram_go === null ? "—" : o.ram_go + " Go RAM"));
-          if (o.vcpu !== null) tdConfig.appendChild(el("small", null, o.vcpu + " vCPU"));
-          cell(tr, null, o.lieu);
-          cell(tr, null, o.type);
-          const tdStock = cell(tr, null, o.stock || "—");
-          if (o.stock && /low|scarce|few|faible/i.test(o.stock)) tdStock.appendChild(el("span", "tag warn", "stock limité"));
-          body.appendChild(tr);
-        });
+      function renderStatus(visible, modelCount) {
+        const status = $("status");
+        status.replaceChildren();
+        status.appendChild(el("strong", null,
+          visible.length + " offres affichées"
+          + (visible.length === offers.length ? "" : " sur " + offers.length)));
+        const providerCount = new Set(visible.map(providerOf)).size;
+        status.appendChild(el("span", null, modelCount + " " + plural(modelCount, "modèle", "modèles")));
+        status.appendChild(el("span", null,
+          providerCount + " " + plural(providerCount, "fournisseur", "fournisseurs")));
+        status.appendChild(el("span", null, hasFilters()
+          ? "Filtres actifs"
+          : (demo ? "Aperçu fictif" : "Mise à jour : " + formatDate(updated))));
+        status.appendChild(el("span", null, demo ? "Données d’exemple" : "Source : scan_gpu.py"));
+      }
 
-        renderStatus(rows.length);
+      function updateExpandAll() {
+        const button = $("expand-all");
+        const allOpen = currentGroups.length > 0 && currentGroups.every((g) => expandedGroups.has(g.key));
+        button.textContent = allOpen ? "Tout replier" : "Tout déplier";
+        button.setAttribute("aria-expanded", String(allOpen));
+        button.hidden = currentGroups.length === 0;
       }
 
       function updateSortHeaders() {
@@ -1015,32 +1090,32 @@
       }
 
       function renderAll() {
-        const groups = makeGroups();
-        renderSummary(groups);
         fillSelect($("provider"), Array.from(new Set(offers.map(providerOf))).sort((a, b) => a.localeCompare(b, "fr")), "Tous");
         fillSelect($("location"), Array.from(new Set(offers.map((o) => o.lieu))).sort((a, b) => a.localeCompare(b, "fr")), "Toutes");
         updateRateNote();
         updateSortHeaders();
         updateCountdown();
-        renderOffers();
+        renderFiltered();
       }
 
       function showData() {
         $("summary").hidden = false;
+        $("offres").hidden = false;
         $("empty").hidden = true;
-        $("offers-wrap").hidden = false;
       }
 
       function showEmpty(error) {
         offers = [];
         demo = false;
+        currentGroups = [];
+        expandedGroups.clear();
         $("summary").hidden = true;
-        $("offers-wrap").hidden = true;
+        $("offres").hidden = true;
         $("empty").hidden = false;
         $("demo-banner").hidden = true;
-        $("offers-body").replaceChildren();
-        $("summary-body").replaceChildren();
+        $("market-table").querySelectorAll("tbody").forEach((tbody) => tbody.remove());
         $("status").textContent = "Aucune donnée chargée.";
+        updateExpandAll();
         updateCountdown();
         const detail = error && error.message ? error.message : "Fichier introuvable";
         $("empty-message").textContent = detail + ". Fichiers attendus : gpu-market.json ou data/gpu-market.json.";
@@ -1093,12 +1168,34 @@
         sortKey = "price";
         sortDir = "asc";
         updateSortHeaders();
-        renderOffers();
+        renderAll();
       });
-      $("q").addEventListener("input", renderOffers);
-      $("provider").addEventListener("change", renderOffers);
-      $("location").addEventListener("change", renderOffers);
-      $("max-price").addEventListener("input", renderOffers);
+      $("q").addEventListener("input", renderFiltered);
+      $("provider").addEventListener("change", renderFiltered);
+      $("location").addEventListener("change", renderFiltered);
+      $("max-price").addEventListener("input", renderFiltered);
+
+      $("market-table").addEventListener("click", (event) => {
+        const toggle = event.target.closest("button[data-group]");
+        if (toggle) {
+          const key = toggle.dataset.group;
+          if (expandedGroups.has(key)) expandedGroups.delete(key);
+          else expandedGroups.add(key);
+          renderFiltered();
+          const next = Array.from($("market-table").querySelectorAll("button[data-group]"))
+            .find((button) => button.dataset.group === key);
+          if (next) next.focus();
+          return;
+        }
+        if (event.target.closest("#empty-reset")) $("reset").click();
+      });
+
+      $("expand-all").addEventListener("click", () => {
+        const allOpen = currentGroups.length > 0 && currentGroups.every((g) => expandedGroups.has(g.key));
+        expandedGroups = new Set();
+        if (!allOpen) currentGroups.forEach((g) => expandedGroups.add(g.key));
+        renderFiltered();
+      });
 
       document.querySelectorAll("th button[data-sort]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -1110,7 +1207,7 @@
             sortDir = key === "price" || key === "gpu" || key === "source" || key === "lieu" ? "asc" : "desc";
           }
           updateSortHeaders();
-          renderOffers();
+          renderFiltered();
         });
       });
 
