@@ -42,6 +42,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
       padding: 1.4rem 0;
       border-bottom: 1px solid var(--border);
     }
@@ -68,14 +69,11 @@
       box-shadow: 0 0 18px var(--accent);
     }
 
-    nav { display: flex; gap: 1.2rem; font-size: 0.95rem; }
+    nav { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.95rem; }
     nav a { color: var(--muted); }
     nav a:hover { color: var(--text); }
 
-    .hero {
-      padding: 6rem 0 4rem;
-      max-width: 760px;
-    }
+    .hero { padding: 5rem 0 3rem; max-width: 820px; }
 
     .badge {
       display: inline-block;
@@ -105,7 +103,7 @@
     .lead {
       font-size: 1.2rem;
       color: var(--muted);
-      max-width: 640px;
+      max-width: 700px;
       margin: 0 0 2rem;
     }
 
