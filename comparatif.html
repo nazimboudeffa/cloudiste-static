@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comparatif GPU cloud gaming : Vast.ai vs Runpod | CloudistePAD</title>
-  <meta name="description" content="Comparatif des fournisseurs GPU pour le cloud gaming en France : Vast.ai, Runpod, Paperspace. Prix, disponibilité, Sunshine/Moonlight et budgets.">
+  <meta name="description" content="Comparatif des fournisseurs GPU pour le cloud gaming en France : Vast.ai, Runpod, Paperspace, NovaPod. Prix, disponibilité, Sunshine/Moonlight et budgets.">
   <link rel="canonical" href="https://cloudiste.fr/comparatif.html">
   <link rel="alternate" hreflang="fr" href="https://cloudiste.fr/comparatif.html">
   <link rel="alternate" hreflang="x-default" href="https://cloudiste.fr/comparatif.html">
@@ -49,14 +49,16 @@
         "@id": "https://cloudiste.fr/comparatif.html#webpage",
         "url": "https://cloudiste.fr/comparatif.html",
         "name": "Comparatif des fournisseurs GPU pour le cloud gaming",
-        "description": "Comparatif des fournisseurs GPU pour le cloud gaming en France : Vast.ai, Runpod, Paperspace, prix et compatibilité Sunshine/Moonlight.",
+        "description": "Comparatif des fournisseurs GPU pour le cloud gaming en France : Vast.ai, Runpod, Paperspace, NovaPod, prix et compatibilité Sunshine/Moonlight.",
         "inLanguage": "fr",
-        "dateModified": "2026-11-24",
+        "dateModified": "2026-11-26",
         "isPartOf": { "@id": "https://cloudiste.fr/#website" },
         "about": [
           { "@type": "Thing", "name": "Cloud gaming" },
           { "@type": "Thing", "name": "Vast.ai" },
           { "@type": "Thing", "name": "Runpod" },
+          { "@type": "Thing", "name": "Paperspace" },
+          { "@type": "Thing", "name": "NovaPod" },
           { "@type": "Thing", "name": "GPU cloud" }
         ]
       }
@@ -328,7 +330,7 @@
 
     <main>
       <div class="hero">
-        <div class="badge">Prix vérifiés le 24 novembre 2026</div>
+        <div class="badge">Prix vérifiés en novembre 2026</div>
         <h1>Comparatif des fournisseurs <span>GPU</span></h1>
         <div class="note red">
           <p><strong>Cette page ne contient aucun lien d'affiliation.</strong> Les liens ci-dessous sont fournis à titre informatif.</p>
@@ -482,16 +484,35 @@
                 <td>Selon capacité</td>
                 <td><span class="tag bad">Pas un choix sûr</span><br><small>Sans preuve d'une VM complète, d'une IP publique et des ports UDP entrants.</small></td>
               </tr>
+              <tr>
+                <td><a href="https://www.paperspace.com/">Paperspace</a></td>
+                <td>VM GPU (Machines)</td>
+                <td>M4000, P4000, RTX4000, A4000, A5000</td>
+                <td>0,45 à 1,38 $/h GPU seul, hors stockage et IP</td>
+                <td>USD</td>
+                <td>Amsterdam (AMS1)</td>
+                <td><span class="tag info">Repli pour un test</span><br><small>Vraie VM persistante avec SSH, mais hors budget ; ports UDP à confirmer.</small></td>
+              </tr>
+              <tr>
+                <td><a href="https://novapod.io/">NovaPod</a></td>
+                <td>Marketplace GPU (pods Docker ou VM KVM root)</td>
+                <td>RTX 3090, 4090, 5090 repérées ; RTX 3060 non vérifiée</td>
+                <td>Prix « ask » variables, facturés à la seconde ; RTX non relevés</td>
+                <td>Crypto (USDT, USDC, ETH, SOL, BNB)</td>
+                <td>Non précisé</td>
+                <td><span class="tag warn">À vérifier</span><br><small>Seule l'option KVM root est pertinente (IP publique, ports entrants ouverts selon le site) ; paiement crypto.</small></td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <p style="color: var(--muted); font-size: 0.9rem;">Paperspace est également analysé ci-dessous (vraie VM persistante, région d'Amsterdam, mais hors budget) : il ne figurait pas dans le tableau source.</p>
 
         <h3 style="margin-top: 2rem;">Lecture du tableau</h3>
         <ul class="clean">
           <li><strong>Meilleures pistes à petit budget :</strong> Vast.ai et TensorDock, parce que les marketplaces peuvent proposer des GeForce à prix compétitif.</li>
           <li><strong>Meilleure piste de facturation en euros :</strong> HOSTKEY pour des VDS GPU GeForce, mais les prix mensuels dépassent ton budget d'usage occasionnel. Infomaniak mérite une vérification directe, sans garantie de compatibilité gaming.</li>
           <li><strong>Solutions cloud datacenter :</strong> Scaleway et OVHcloud sont solides pour des VM GPU, mais leurs tarifs GPU relevés dépassent ton plafond de 0,30 €/h.</li>
+          <li><strong>Paperspace :</strong> vraie VM persistante à Amsterdam, mais à partir de 0,45 $/h pour le GPU seul, donc hors budget et en dollars.</li>
+          <li><strong>NovaPod :</strong> marketplace à tarifs « live » facturés à la seconde, paiement uniquement en crypto. Seule son option VM KVM root est envisageable pour CloudistePAD.</li>
           <li><strong>Offres conteneurisées :</strong> elles ne sont pas interchangeables avec une VM gaming. Une image Docker avec GPU ne suffit pas à faire fonctionner un bureau complet, Steam, Sunshine et les connexions Moonlight.</li>
         </ul>
       </section>
@@ -528,7 +549,7 @@
           </div>
 
           <div class="card">
-            <h3>F. Paperspace <span class="tag info">VM persistante, mais chère</span></h3>
+            <h3>E. Paperspace <span class="tag info">VM persistante, mais chère</span></h3>
             <p>Paperspace (désormais documenté dans l'écosystème DigitalOcean) propose <strong>Machines</strong>, une vraie VM Linux ou Windows avec GPU, stockage persistant, IP publique possible et accès SSH. La région d'Amsterdam (AMS1) est intéressante depuis la France. <a href="https://docs.digitalocean.com/products/paperspace/">Documentation</a> · <a href="https://github.com/Paperspace/CORE-API-Docs/blob/master/api-documentation/machines/README.md">Régions</a></p>
             <p><strong>Tarifs GPU horaires publiés</strong> (USD, hors stockage et IP) : M4000 0,45 $/h · P4000 0,51 $/h · RTX4000 0,56 $/h · P5000 0,78 $/h · A4000 0,76 $/h · A5000 1,38 $/h. Même le moins cher dépasse le plafond de 0,30 €/h avant conversion. <a href="https://docs.digitalocean.com/products/paperspace/pricing/">Tarifs officiels</a></p>
             <p><strong>Points positifs :</strong> VM complète, stockage persistant, SSH, IP publique, latence correcte depuis la France ; le calcul GPU s'arrête à l'extinction, mais stockage et IP continuent d'être facturés. <a href="https://docs.digitalocean.com/products/paperspace/machines/how-to/manage-public-ips/">Gestion des IP</a></p>
@@ -537,7 +558,16 @@
           </div>
 
           <div class="card">
-            <h3>E. RunPod, Clore.ai, VRAMfarm et SaladCloud <span class="tag bad">À écarter sans preuve</span></h3>
+            <h3>F. NovaPod <span class="tag warn">Marketplace crypto, seule l'option KVM est envisageable</span></h3>
+            <p><em>Informations relevées sur le site officiel le 26 novembre 2026, non vérifiées de façon indépendante.</em></p>
+            <p>NovaPod propose des <strong>pods Docker</strong> (démarrage en moins de 15 s) et des <strong>VM KVM root</strong> avec disque NVMe persistant, IPv4 publique dédiée et pare-feu configurable. Ubuntu 24.04, Debian 12 ou Windows Server GPU sont annoncés, avec facturation à la seconde ; une VM arrêtée ne coûte que le stockage « en veille ». <a href="https://novapod.io/">Site NovaPod</a> · <a href="https://docs.novapod.io">Documentation</a></p>
+            <p><strong>Points positifs :</strong> l'option KVM correspond au profil requis (VM complète, root/SSH, IP publique, persistance) ; facturation à la seconde, sans minimum ni engagement ; GeForce RTX 3090, 4090 et 5090 citées parmi les GPU disponibles.</p>
+            <p><strong>Points de vigilance :</strong> paiement uniquement en crypto (USDT, USDC, ETH, SOL, BNB), pas de facturation en euros ni de facture avec TVA ; aucun prix relevé pour une GeForce adaptée (tarifs « ask » en direct) ; aucune région européenne indiquée sur la page d'accueil ; pods Docker à écarter pour Sunshine ; ports UDP non confirmés explicitement ; fournisseur non mentionné par le dépôt CloudistePAD.</p>
+            <p class="verdict"><strong>Verdict :</strong> à tester uniquement si le paiement en crypto ne te gêne pas et si une RTX 3060/3090 en KVM s'affiche sous 0,30 $/h. À défaut, il reste derrière Vast.ai et TensorDock.</p>
+          </div>
+
+          <div class="card">
+            <h3>G. RunPod, Clore.ai, VRAMfarm et SaladCloud <span class="tag bad">À écarter sans preuve</span></h3>
             <p>Ces services peuvent être intéressants pour louer de la puissance GPU, lancer des conteneurs ou exécuter des applications IA. Mais CloudistePAD demande un environnement de PC distant avec accès réseau entrant et une VM suffisamment complète : il faut examiner le produit exact, et pas seulement la présence d'un GPU NVIDIA.</p>
             <p class="verdict"><strong>Verdict :</strong> ne pas les retenir sans confirmation explicite d'une VM complète, de l'accès réseau Sunshine et de la persistance.</p>
           </div>
@@ -652,6 +682,8 @@ Merci.</pre>
           <li><a href="https://www.ovhcloud.com/">OVHcloud — Public Cloud</a></li>
           <li><a href="https://www.runpod.io/">RunPod</a> · <a href="https://clore.ai/">Clore.ai</a> · <a href="https://vramfarm.com/">VRAMfarm</a></li>
           <li><a href="https://www.hetzner.com/">Hetzner</a> · <a href="https://www.infomaniak.com/">Infomaniak</a> · <a href="https://salad.com/">SaladCloud</a></li>
+          <li><a href="https://www.paperspace.com/">Paperspace</a> · <a href="https://docs.digitalocean.com/products/paperspace/">Documentation Machines</a> · <a href="https://docs.digitalocean.com/products/paperspace/pricing/">Tarifs officiels</a></li>
+          <li><a href="https://novapod.io/">NovaPod</a> · <a href="https://docs.novapod.io">Documentation</a></li>
           <li><a href="https://vramfarm.com/fr/blog/gpu-cloud-europe/">Panorama des GPU cloud en Europe — tarifs et régions</a></li>
           <li><a href="https://vramfarm.com/en/compare/">Comparatif de fournisseurs GPU cloud</a> · <a href="https://www.gpuradar.eu/hosting">GPU Radar — offres GPU en Europe</a></li>
         </ul>
