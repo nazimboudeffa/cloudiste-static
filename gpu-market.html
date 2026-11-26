@@ -6,7 +6,10 @@
   <meta name="description" content="Marché des GPU en France : prix à la demande par GPU et par heure, données Vast.ai et Runpod collectées par scan_gpu.py.">
   <!-- Montage Dokploy avec volume partagé. -->
   <meta name="gpu-market-data" content="data/gpu-market.json">
-  <!-- Intervalle du cron en minutes : 60 pour 0 * * * *, 360 pour 0 */6 * * *. -->
+  <!-- Cron quotidien à minuit : 0 0 * * *. Même fuseau que le champ Timezone du job Dokploy. -->
+  <meta name="gpu-scan-schedule" content="daily">
+  <meta name="gpu-scan-tz" content="UTC">
+  <!-- Mode "interval" seulement : 60 = 0 * * * *, 360 = 0 */6 * * *. Ignoré en mode "daily". -->
   <meta name="gpu-scan-interval" content="360">
   <title>CloudistePAD - Marché des GPU</title>
   <style>
@@ -519,6 +522,15 @@
       const metaData = document.querySelector('meta[name="gpu-market-data"]');
       const configuredData = new URLSearchParams(location.search).get("data") || (metaData && metaData.content);
       const DATA_URLS = configuredData ? [configuredData] : ["gpu-market.json", "data/gpu-market.json"];
+      const metaSchedule = document.querySelector('meta[name="gpu-scan-schedule"]');
+      const SCHEDULE_MODE = metaSchedule && metaSchedule.content.trim().toLowerCase() === "daily" ? "daily" : "interval";
+      const metaTz = document.querySelector('meta[name="gpu-scan-tz"]');
+      let SCAN_TZ = (metaTz && metaTz.content.trim()) || "UTC";
+      try {
+        new Intl.DateTimeFormat("fr-FR", { timeZone: SCAN_TZ });
+      } catch (e) {
+        SCAN_TZ = "UTC";
+      }
       const metaInterval = document.querySelector('meta[name="gpu-scan-interval"]');
       const parsedInterval = Number(metaInterval && metaInterval.content);
       const SCAN_INTERVAL_MIN = Number.isFinite(parsedInterval) && parsedInterval > 0 ? parsedInterval : 360;
@@ -623,16 +635,66 @@
         return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(date);
       }
 
+      function zonedParts(date) {
+        const parts = {};
+        new Intl.DateTimeFormat("en-US", {
+          timeZone: SCAN_TZ,
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", second: "2-digit",
+          hourCycle: "h23"
+        }).formatToParts(date).forEach((p) => {
+          if (p.type !== "literal") parts[p.type] = p.value;
+        });
+        return parts;
+      }
+
+      function zoneOffsetMs(date) {
+        const p = zonedParts(date);
+        const asUtc = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day),
+          Number(p.hour), Number(p.minute), Number(p.second));
+        return asUtc - Math.floor(date.getTime() / 1000) * 1000;
+      }
+
+      // Minuit du jour courant dans le fuseau du cron, converti en instant UTC.
+      function zonedMidnight(date) {
+        const p = zonedParts(date);
+        const guess = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day));
+        let midnight = guess - zoneOffsetMs(new Date(guess));
+        midnight = guess - zoneOffsetMs(new Date(midnight)); // ajustement heure d’été
+        return midnight;
+      }
+
       function nextScanTime() {
         if (demo || !updated || isNaN(updated.getTime())) return null;
+        if (SCHEDULE_MODE === "daily") {
+          const midnight = zonedMidnight(new Date());
+          return new Date(midnight > Date.now() ? midnight : midnight + 86400000);
+        }
         return new Date(updated.getTime() + SCAN_INTERVAL_MIN * 60000);
       }
 
+      function previousScanTime() {
+        if (SCHEDULE_MODE !== "daily") return null;
+        const midnight = zonedMidnight(new Date());
+        return new Date(midnight <= Date.now() ? midnight : midnight - 86400000);
+      }
+
+      function displayTimeZone() {
+        return SCHEDULE_MODE === "daily" ? SCAN_TZ : undefined;
+      }
+
+      function dayKey(date) {
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: displayTimeZone(), year: "numeric", month: "2-digit", day: "2-digit"
+        }).format(date);
+      }
+
       function formatShortDate(date) {
-        const sameDay = date.toDateString() === new Date().toDateString();
-        const options = sameDay
-          ? { hour: "2-digit", minute: "2-digit" }
-          : { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
+        const options = { timeZone: displayTimeZone(), hour: "2-digit", minute: "2-digit" };
+        if (dayKey(date) !== dayKey(new Date())) {
+          options.day = "numeric";
+          options.month = "short";
+        }
         return new Intl.DateTimeFormat("fr-FR", options).format(date);
       }
 
@@ -645,16 +707,21 @@
           note.textContent = demo ? "aperçu fictif" : "date de mise à jour inconnue";
           return;
         }
-        const minutes = Math.ceil((target.getTime() - Date.now()) / 60000);
-        if (minutes <= 0) {
+        const expected = previousScanTime();
+        const late = expected
+          ? updated.getTime() < expected.getTime() + 15 * 60000
+          : target.getTime() <= Date.now();
+        if (late) {
           value.textContent = "en retard";
-          note.textContent = "scan attendu vers " + formatShortDate(target);
+          note.textContent = "scan attendu vers " + formatShortDate(expected || target);
           return;
         }
+        const minutes = Math.ceil((target.getTime() - Date.now()) / 60000);
         const hours = Math.floor(minutes / 60);
         const rest = minutes % 60;
         value.textContent = (hours ? hours + " h " : "") + rest + " min";
-        note.textContent = "vers " + formatShortDate(target);
+        note.textContent = (SCHEDULE_MODE === "daily" ? "minuit " + SCAN_TZ + " · " : "")
+          + "vers " + formatShortDate(target);
       }
 
       function makeGroups() {

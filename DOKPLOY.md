@@ -29,17 +29,29 @@ Dans `gpu-market.html`, décommente la balise du `<head>` :
 <meta name="gpu-market-data" content="data/gpu-market.json">
 ```
 
-Vérifie aussi l’intervalle du cron dans le `<head>` :
+Vérifie aussi la fréquence du cron dans le `<head>` :
+
+```html
+<meta name="gpu-scan-schedule" content="daily">
+<meta name="gpu-scan-tz" content="UTC">
+```
+
+- `daily` = un scan par jour à minuit (`0 0 * * *`) — réglage actuel.
+- `gpu-scan-tz` doit reprendre **le même fuseau que le champ Timezone du job Dokploy** :
+  `UTC` par défaut, ou `Europe/Paris` si tu veux minuit à l’heure de Paris.
+
+Pour revenir à un intervalle, mets `content="interval"` puis choisis :
 
 ```html
 <meta name="gpu-scan-interval" content="360">
 ```
 
-- `360` pour `0 */6 * * *` (toutes les 6 heures) — valeur par défaut.
+- `360` pour `0 */6 * * *` (toutes les 6 heures).
 - `60` pour `0 * * * *` (toutes les heures).
 
-La page affiche alors le temps restant avant le prochain scan, calculé à partir de la date de
-modification du JSON. C’est une estimation : si un scan échoue, elle se mettra en « en retard ».
+En mode `daily`, le compte à rebours vise le prochain minuit dans `gpu-scan-tz`. En mode
+`interval`, il utilise la date de modification du JSON + l’intervalle. Dans les deux cas c’est
+une estimation : si le scan n’a pas tourné à l’heure prévue, la carte affiche « en retard ».
 
 Puis commit et push. Sans la balise `gpu-market-data`, la page essaie d’abord
 `gpu-market.json` à la racine, puis `data/gpu-market.json` — ça marche aussi, mais avec un
@@ -96,7 +108,12 @@ Dans le service Compose : **Schedules / Tâches planifiées** → nouveau job.
   ```bash
   python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
   ```
-- Cron : `0 */6 * * *` (toutes les 6 heures) ou `0 * * * *` (toutes les heures).
+- **Cron / expression cron** : `0 0 * * *` — minute `0`, heure `0`, tous les jours.
+- **Timezone** : `UTC` (valeur par défaut de Dokploy) ou `Europe/Paris`. Mets la **même
+  valeur** dans `gpu-scan-tz` du HTML, sinon le compte à rebours affichera une heure décalée.
+
+Si tu avais gardé l’ancien job `0 */6 * * *`, modifie-le plutôt que d’en créer un deuxième :
+deux jobs écrivant le même fichier se disputeraient le volume.
 
 Dokploy garde l’historique et les logs de chaque exécution. Le script écrit d’abord un `.tmp`
 puis le renomme, ce qui évite qu’une requête lise un JSON partiel.
