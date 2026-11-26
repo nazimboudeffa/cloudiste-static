@@ -248,6 +248,7 @@
     .note strong { color: var(--text); }
 
     pre {
+      position: relative;
       background: #070b16;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -256,6 +257,25 @@
       color: #d7e2ff;
       font-size: 0.95rem;
     }
+
+    pre.copyable { padding-top: 3.2rem; }
+
+    .copy-button {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      background: var(--card);
+      font: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .copy-button:hover { background: var(--bg-soft); }
+    .copy-button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
     .steps { color: var(--muted); padding-left: 1.2rem; }
     .steps li { margin-bottom: 0.5rem; }
@@ -380,8 +400,7 @@
       <section id="demarrage">
         <h2>Démarrage rapide</h2>
         <p class="lead">Sur une VM Ubuntu complète (x86_64) avec accès SSH/root et driver NVIDIA déjà installé :</p>
-        <pre><code>curl -fsSL https://raw.githubusercontent.com/nazimboudeffa/cloudiste-pad/main/deploy.sh -o deploy.sh
-bash deploy.sh deploy</code></pre>
+        <pre class="copyable"><button class="copy-button" type="button" aria-label="Copier le code" aria-live="polite">Copier</button><code>curl -fsSL https://raw.githubusercontent.com/nazimboudeffa/cloudiste-pad/main/deploy.sh -o deploy.sh && bash deploy.sh deploy</code></pre>
         <ol class="steps">
           <li>Connecte la VM et ton PC au même réseau <a href="https://tailscale.com/">Tailscale</a>.</li>
           <li>Récupère l’IP avec <code>tailscale ip -4</code>.</li>
@@ -399,5 +418,26 @@ bash deploy.sh deploy</code></pre>
       <span>Licence AGPL-3.0 · <a href="https://github.com/nazimboudeffa/cloudiste-pad">GitHub</a></span>
     </footer>
   </div>
+  <script>
+    document.querySelectorAll("pre.copyable").forEach((block) => {
+      const button = block.querySelector(".copy-button");
+      const code = block.querySelector("code");
+      let resetTimer;
+
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(code.textContent);
+          button.textContent = "Copié !";
+        } catch {
+          button.textContent = "Échec";
+        }
+
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          button.textContent = "Copier";
+        }, 2000);
+      });
+    });
+  </script>
 </body>
 </html>
