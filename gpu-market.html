@@ -3,7 +3,69 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Marché des GPU en France : prix à la demande par GPU et par heure, données Vast.ai et Runpod collectées par scan_gpu.py.">
+  <title>Prix GPU cloud gaming en France | CloudistePAD</title>
+  <meta name="description" content="Prix des GPU à la demande en France : comparez Vast.ai et Runpod, prix plancher par heure, offre la moins chère et mise à jour quotidienne.">
+  <link rel="canonical" href="https://cloudiste.fr/gpu-market.html">
+  <link rel="alternate" hreflang="fr" href="https://cloudiste.fr/gpu-market.html">
+  <link rel="alternate" hreflang="x-default" href="https://cloudiste.fr/gpu-market.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#0b1020">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CloudistePAD">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Prix GPU cloud gaming en France | CloudistePAD">
+  <meta property="og:description" content="Comparez les prix des GPU à la demande chez Vast.ai et Runpod, avec le prix plancher par heure et par modèle.">
+  <meta property="og:url" content="https://cloudiste.fr/gpu-market.html">
+  <meta property="og:image" content="https://cloudiste.fr/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Prix des GPU pour le cloud gaming en France">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prix GPU cloud gaming en France | CloudistePAD">
+  <meta name="twitter:description" content="Comparez les prix des GPU à la demande chez Vast.ai et Runpod, avec le prix plancher par heure et par modèle.">
+  <meta name="twitter:image" content="https://cloudiste.fr/og-image.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cloudiste.fr/#website",
+        "url": "https://cloudiste.fr/",
+        "name": "CloudistePAD",
+        "inLanguage": "fr",
+        "publisher": { "@id": "https://cloudiste.fr/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://cloudiste.fr/#organization",
+        "name": "CloudistePAD",
+        "url": "https://cloudiste.fr/",
+        "sameAs": ["https://github.com/nazimboudeffa/cloudiste-pad"]
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://cloudiste.fr/gpu-market.html#dataset",
+        "name": "Prix des GPU à la demande en France",
+        "description": "Prix horaire des GPU chez Vast.ai et Runpod, collectés chaque jour pour le cloud gaming.",
+        "url": "https://cloudiste.fr/gpu-market.html",
+        "inLanguage": "fr",
+        "creator": { "@id": "https://cloudiste.fr/#organization" },
+        "temporalCoverage": "daily",
+        "variableMeasured": ["prix par GPU et par heure", "fournisseur", "disponibilité", "localisation"],
+        "distribution": [
+          {
+            "@type": "DataDownload",
+            "encodingFormat": "application/json",
+            "contentUrl": "https://cloudiste.fr/data/gpu-market.json"
+          }
+        ],
+        "isPartOf": { "@id": "https://cloudiste.fr/#website" }
+      }
+    ]
+  }
+  </script>
   <!-- Montage Dokploy avec volume partagé. -->
   <meta name="gpu-market-data" content="data/gpu-market.json">
   <!-- Cron quotidien à minuit : 0 0 * * *. Même fuseau que le champ Timezone du job Dokploy. -->
@@ -11,7 +73,6 @@
   <meta name="gpu-scan-tz" content="UTC">
   <!-- Mode "interval" seulement : 60 = 0 * * * *, 360 = 0 */6 * * *. Ignoré en mode "daily". -->
   <meta name="gpu-scan-interval" content="360">
-  <title>CloudistePAD - Marché des GPU</title>
   <style>
     :root {
       --bg: #0b1020;

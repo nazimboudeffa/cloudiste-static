@@ -130,6 +130,26 @@ puis le renomme, ce qui évite qu’une requête lise un JSON partiel.
 - **Migration** : une fois le nouveau service validé, supprime l’ancienne Application statique
   pour éviter deux services sur le même domaine.
 
+## 6. SEO
+
+Les trois pages contiennent : `<title>` optimisé, meta description, `canonical`, `hreflang`
+`fr` / `x-default`, Open Graph, Twitter Card, `robots`, `theme-color` et des données structurées
+JSON-LD (`SoftwareApplication`, `WebPage`, `Dataset`).
+
+Fichiers publics ajoutés et copiés par le `Dockerfile` : `robots.txt`, `sitemap.xml`,
+`favicon.svg` et `og-image.png` (1200 × 630 pour le partage sur les réseaux sociaux).
+
+Les URL canoniques utilisent `https://cloudiste.fr`. **Si ton domaine est différent**, remplace
+cette chaîne dans les trois fichiers HTML, dans `robots.txt` et dans `sitemap.xml`, puis
+redéploie.
+
+Après déploiement :
+
+1. Vérifier `https://cloudiste.fr/robots.txt` et `https://cloudiste.fr/sitemap.xml`.
+2. Soumettre le sitemap dans **Google Search Console** et **Bing Webmaster Tools**.
+3. Tester le JSON-LD avec <https://validator.schema.org/> et l’aperçu sociaux avec le
+   *Sharing Debugger* de Facebook / *Card Validator* de Twitter.
+
 ## Test local avant Dokploy
 
 ```bash
