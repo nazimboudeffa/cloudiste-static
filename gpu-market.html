@@ -544,7 +544,7 @@
 
       <section id="market">
         <h2>Offres de GPU en France</h2>
-        <p class="lead">Filtrez par modèle, fournisseur, lieu ou prix, puis cliquez sur une ligne GPU pour déplier ses offres. Cliquez sur un en-tête pour trier.</p>
+        <p class="lead">Filtrez par modèle, fournisseur, lieu ou prix. Cliquez sur un en-tête pour trier les groupes et les offres ; chaque ligne GPU peut être repliée.</p>
 
         <div class="note warn" id="demo-banner" hidden>
           <p><strong>Aperçu de démonstration : ces prix sont fictifs.</strong> Remplacez-les par vos propres données avec <code>scan_gpu.py</code>.</p>
@@ -576,7 +576,7 @@
           </div>
           <div class="toolbar-actions">
             <button class="btn" type="button" id="refresh">Actualiser</button>
-            <button class="btn" type="button" id="expand-all" aria-expanded="false">Tout déplier</button>
+            <button class="btn" type="button" id="expand-all" aria-expanded="true">Tout replier</button>
             <button class="btn" type="button" id="reset">Réinitialiser les filtres</button>
           </div>
         </div>
@@ -688,7 +688,7 @@
       let currency = "usd";
       let sortKey = "price";
       let sortDir = "asc";
-      let expandedGroups = new Set();
+      let collapsedGroups = new Set();
       let currentGroups = [];
 
       const $ = (id) => document.getElementById(id);
@@ -874,15 +874,16 @@
           map.get(key).list.push(o);
         });
         const groups = Array.from(map.values());
-        const groupValue = (g) => sortKey === "gpu"
-          ? g.key
-          : Math.min.apply(null, g.list.map(priceOf));
-        const direction = (sortKey === "gpu" || sortKey === "price") ? sortDir : "asc";
+        const cheapest = (g) => g.list.reduce(
+          (acc, o) => (!acc || priceOf(o) < priceOf(acc) ? o : acc), null);
+        const groupValue = (g) => valueFor(cheapest(g), sortKey);
+        const floorValue = (g) => Math.min.apply(null, g.list.map(priceOf));
         groups.sort((a, b) => {
           const va = groupValue(a);
           const vb = groupValue(b);
           const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb), "fr");
-          return direction === "asc" ? cmp : -cmp;
+          if (cmp) return sortDir === "asc" ? cmp : -cmp;
+          return floorValue(a) - floorValue(b) || a.key.localeCompare(b.key, "fr");
         });
         return groups;
       }
@@ -929,7 +930,7 @@
           const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
           const bestOffer = group.list.find((o) => priceOf(o) === low);
           const providers = Array.from(new Set(group.list.map(providerOf)));
-          const open = expandedGroups.has(group.key);
+          const open = !collapsedGroups.has(group.key);
 
           const tbody = el("tbody", "group");
           const trGroup = el("tr", "group-row");
@@ -1068,7 +1069,7 @@
 
       function updateExpandAll() {
         const button = $("expand-all");
-        const allOpen = currentGroups.length > 0 && currentGroups.every((g) => expandedGroups.has(g.key));
+        const allOpen = currentGroups.every((g) => !collapsedGroups.has(g.key));
         button.textContent = allOpen ? "Tout replier" : "Tout déplier";
         button.setAttribute("aria-expanded", String(allOpen));
         button.hidden = currentGroups.length === 0;
@@ -1108,7 +1109,7 @@
         offers = [];
         demo = false;
         currentGroups = [];
-        expandedGroups.clear();
+        collapsedGroups.clear();
         $("summary").hidden = true;
         $("offres").hidden = true;
         $("empty").hidden = false;
@@ -1179,8 +1180,8 @@
         const toggle = event.target.closest("button[data-group]");
         if (toggle) {
           const key = toggle.dataset.group;
-          if (expandedGroups.has(key)) expandedGroups.delete(key);
-          else expandedGroups.add(key);
+          if (collapsedGroups.has(key)) collapsedGroups.delete(key);
+          else collapsedGroups.add(key);
           renderFiltered();
           const next = Array.from($("market-table").querySelectorAll("button[data-group]"))
             .find((button) => button.dataset.group === key);
@@ -1191,9 +1192,9 @@
       });
 
       $("expand-all").addEventListener("click", () => {
-        const allOpen = currentGroups.length > 0 && currentGroups.every((g) => expandedGroups.has(g.key));
-        expandedGroups = new Set();
-        if (!allOpen) currentGroups.forEach((g) => expandedGroups.add(g.key));
+        const allOpen = currentGroups.every((g) => !collapsedGroups.has(g.key));
+        collapsedGroups = new Set();
+        if (allOpen) currentGroups.forEach((g) => collapsedGroups.add(g.key));
         renderFiltered();
       });
 
