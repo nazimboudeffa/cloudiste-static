@@ -53,7 +53,12 @@
       font-weight: 800;
       letter-spacing: -0.02em;
       font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
     }
+
+    .brand:hover { text-decoration: none; }
+    .brand:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 4px; }
 
     .brand .dot {
       width: 12px;
@@ -199,7 +204,7 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="brand"><span class="dot"></span> CloudistePAD</div>
+      <a class="brand" href="index.html" aria-label="CloudistePAD — retour à l’accueil"><span class="dot"></span> CloudistePAD</a>
       <nav>
         <a href="#fonctions">Fonctions</a>
         <a href="#fork">Fork de Cloudypad</a>
