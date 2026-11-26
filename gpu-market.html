@@ -37,6 +37,7 @@
 
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    a.external::after { content: " ↗"; font-size: 0.8em; opacity: 0.7; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
 
     .wrap {
@@ -492,7 +493,8 @@
 
         <div class="note">
           <p><strong>Méthode :</strong> prix par GPU et par heure, hors CPU, RAM, disque, réseau, taxes et frais de stockage. Le script ne retient que les offres disponibles à la demande dont la machine est en France.</p>
-          <p>Les offres marketplace changent vite : vérifiez toujours le prix final, la VM complète, l’accès SSH, les ports UDP de Sunshine et la persistance du disque avant de louer. <strong>Aucun lien d’affiliation sur cette page.</strong></p>
+          <p>Les noms de GPU renvoient vers l’offre du fournisseur : déploiement Runpod pré-rempli ou marketplace Vast.ai. Dans le tableau récapitulatif, le lien pointe vers l’offre la moins chère du modèle. <strong>Aucun lien d’affiliation sur cette page.</strong></p>
+          <p>Les offres marketplace changent vite : vérifiez toujours le prix final, la VM complète, l’accès SSH, les ports UDP de Sunshine et la persistance du disque avant de louer.</p>
         </div>
       </section>
     </main>
@@ -574,6 +576,28 @@
 
       function providerOf(o) {
         return o.source.split("(")[0].trim();
+      }
+
+      function gpuLabel(name) {
+        return String(name).replace(/^nvidia\s+/i, "").replace(/[_-]+/g, " ").trim();
+      }
+
+      function offerUrl(o) {
+        const gpu = encodeURIComponent(gpuLabel(o.gpu));
+        if (/runpod/i.test(o.source)) {
+          return "https://console.runpod.io/deploy?gpu=" + gpu;
+        }
+        return "https://cloud.vast.ai/create/?gpu_name=" + gpu;
+      }
+
+      function appendGpuLink(td, o) {
+        const provider = providerOf(o);
+        const link = el("a", "external", o.gpu);
+        link.href = offerUrl(o);
+        link.title = "Voir l’offre " + provider + " pour " + o.gpu;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        td.appendChild(link);
       }
 
       function priceOf(o) {
@@ -660,7 +684,9 @@
           const bestOffer = group.list.find((o) => priceOf(o) === low);
           const providers = Array.from(new Set(group.list.map(providerOf)));
           const tr = el("tr");
-          cell(tr, null, group.name);
+          const tdGpu = el("td");
+          appendGpuLink(tdGpu, bestOffer);
+          tr.appendChild(tdGpu);
           const tdLow = cell(tr, "price", fmtPrice(low));
           tdLow.appendChild(el("span", "tag ok", "plancher"));
           cell(tr, null, fmtPrice(avg));
@@ -751,7 +777,9 @@
 
         rows.forEach((o) => {
           const tr = el("tr");
-          cell(tr, null, o.gpu);
+          const tdGpu = el("td");
+          appendGpuLink(tdGpu, o);
+          tr.appendChild(tdGpu);
           cell(tr, null, o.source);
           const tdPrice = cell(tr, "price", fmtPrice(priceOf(o)));
           if (o.usd_gpu_h === bestUsd) tdPrice.appendChild(el("span", "tag ok", "meilleur prix"));
