@@ -23,7 +23,7 @@ Le site est servi par `web`. Le conteneur `gpu-scan` écrit dans le volume parta
 
 ## 1. Préparer la page
 
-Dans `gpu-market.html`, décommente la balise du `<head>` :
+Dans `cloudsgpu.html`, décommente la balise du `<head>` :
 
 ```html
 <meta name="gpu-market-data" content="data/gpu-market.json">
@@ -91,7 +91,7 @@ docker compose exec gpu-scan \
   python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
 ```
 
-Recharge `https://ton-domaine/gpu-market.html` : les offres doivent apparaître. Vérifie aussi
+Recharge `https://ton-domaine/cloudsgpu.html` : les offres doivent apparaître. Vérifie aussi
 que `https://ton-domaine/data/gpu-market.json` renvoie bien le tableau JSON.
 
 > Pourquoi `gpu-scan` reste allumé avec `sleep infinity` ? Dokploy exécute les jobs Compose
@@ -159,4 +159,4 @@ docker compose exec gpu-scan \
   python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
 ```
 
-Ouvre ensuite `http://localhost/gpu-market.html`.
+Ouvre ensuite `http://localhost/cloudsgpu.html`.

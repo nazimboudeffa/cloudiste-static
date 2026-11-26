@@ -6,7 +6,7 @@ Clés API    :  export VAST_API_KEY="..."   et   export RUNPOD_API_KEY="..."
 Exemples    :  python scan_gpu.py
                python scan_gpu.py --gpu "H100" --taux-eur 0.86
                python scan_gpu.py --taux-eur 0.86 --json gpu-market.json
-                   (génère les données de gpu-market.html)
+                   (génère les données de cloudsgpu.html)
 """
 import argparse, json, os, sys
 import requests
