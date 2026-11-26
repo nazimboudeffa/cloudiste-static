@@ -121,6 +121,7 @@ puis le renomme, ce qui évite qu’une requête lise un JSON partiel.
 ## 5. Détails importants
 
 - **Variables d’environnement** : dans l’onglet Environment de Dokploy, pas dans le dépôt.
+  `.env.example` liste les deux clés nécessaires ; copie-le en `.env` pour un test local.
   `.env` est ignoré par Git et exclu du build Docker par `.dockerignore`.
 - **Stack à éviter** : le mode Stack de Dokploy n’autorise pas `build` dans le compose.
 - **Volumes** : `gpu-data` est un volume nommé, donc il survit aux redéploiements. Les anciennes
