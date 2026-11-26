@@ -4,8 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Marché des GPU en France : prix à la demande par GPU et par heure, données Vast.ai et Runpod collectées par scan_gpu.py.">
-  <!-- Montage Dokploy avec volume partagé : décommenter la ligne ci-dessous. -->
+  <!-- Montage Dokploy avec volume partagé. -->
   <meta name="gpu-market-data" content="data/gpu-market.json">
+  <!-- Intervalle du cron en minutes : 60 pour 0 * * * *, 360 pour 0 */6 * * *. -->
+  <meta name="gpu-scan-interval" content="360">
   <title>CloudistePAD - Marché des GPU</title>
   <style>
     :root {
@@ -166,6 +168,7 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .stat .value.countdown { font-size: 1.45rem; }
     .stat small { color: var(--muted); }
 
     .note {
@@ -388,6 +391,11 @@
             <span class="value" id="stat-best">—</span>
             <small id="stat-best-note"></small>
           </div>
+          <div class="stat">
+            <span class="label">Prochain scan estimé</span>
+            <span class="value countdown" id="stat-next">—</span>
+            <small id="stat-next-note"></small>
+          </div>
         </div>
 
         <div class="table-scroll">
@@ -504,6 +512,9 @@
       const metaData = document.querySelector('meta[name="gpu-market-data"]');
       const configuredData = new URLSearchParams(location.search).get("data") || (metaData && metaData.content);
       const DATA_URLS = configuredData ? [configuredData] : ["gpu-market.json", "data/gpu-market.json"];
+      const metaInterval = document.querySelector('meta[name="gpu-scan-interval"]');
+      const parsedInterval = Number(metaInterval && metaInterval.content);
+      const SCAN_INTERVAL_MIN = Number.isFinite(parsedInterval) && parsedInterval > 0 ? parsedInterval : 360;
       const EUR_RATE = 0.86;
 
       // Uniquement pour l'aperçu quand le JSON n'existe pas encore.
@@ -581,6 +592,40 @@
       function formatDate(date) {
         if (!(date instanceof Date) || isNaN(date.getTime())) return "date inconnue";
         return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(date);
+      }
+
+      function nextScanTime() {
+        if (demo || !updated || isNaN(updated.getTime())) return null;
+        return new Date(updated.getTime() + SCAN_INTERVAL_MIN * 60000);
+      }
+
+      function formatShortDate(date) {
+        const sameDay = date.toDateString() === new Date().toDateString();
+        const options = sameDay
+          ? { hour: "2-digit", minute: "2-digit" }
+          : { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
+        return new Intl.DateTimeFormat("fr-FR", options).format(date);
+      }
+
+      function updateCountdown() {
+        const target = nextScanTime();
+        const value = $("stat-next");
+        const note = $("stat-next-note");
+        if (!target) {
+          value.textContent = "—";
+          note.textContent = demo ? "aperçu fictif" : "date de mise à jour inconnue";
+          return;
+        }
+        const minutes = Math.ceil((target.getTime() - Date.now()) / 60000);
+        if (minutes <= 0) {
+          value.textContent = "en retard";
+          note.textContent = "scan attendu vers " + formatShortDate(target);
+          return;
+        }
+        const hours = Math.floor(minutes / 60);
+        const rest = minutes % 60;
+        value.textContent = (hours ? hours + " h " : "") + rest + " min";
+        note.textContent = "vers " + formatShortDate(target);
       }
 
       function makeGroups() {
@@ -745,6 +790,7 @@
         fillSelect($("location"), Array.from(new Set(offers.map((o) => o.lieu))).sort((a, b) => a.localeCompare(b, "fr")), "Toutes");
         updateRateNote();
         updateSortHeaders();
+        updateCountdown();
         renderOffers();
       }
 
@@ -764,6 +810,7 @@
         $("offers-body").replaceChildren();
         $("summary-body").replaceChildren();
         $("status").textContent = "Aucune donnée chargée.";
+        updateCountdown();
         const detail = error && error.message ? error.message : "Fichier introuvable";
         $("empty-message").textContent = detail + ". Fichiers attendus : gpu-market.json ou data/gpu-market.json.";
       }
@@ -847,6 +894,7 @@
       });
 
       load();
+      window.setInterval(updateCountdown, 30000);
     })();
   </script>
 </body>

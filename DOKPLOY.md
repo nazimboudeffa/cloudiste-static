@@ -29,8 +29,21 @@ Dans `gpu-market.html`, décommente la balise du `<head>` :
 <meta name="gpu-market-data" content="data/gpu-market.json">
 ```
 
-Puis commit et push. Sans cette balise, la page essaie d’abord `gpu-market.json` à la racine,
-puis `data/gpu-market.json` — ça marche aussi, mais avec un 404 inutile dans la console.
+Vérifie aussi l’intervalle du cron dans le `<head>` :
+
+```html
+<meta name="gpu-scan-interval" content="360">
+```
+
+- `360` pour `0 */6 * * *` (toutes les 6 heures) — valeur par défaut.
+- `60` pour `0 * * * *` (toutes les heures).
+
+La page affiche alors le temps restant avant le prochain scan, calculé à partir de la date de
+modification du JSON. C’est une estimation : si un scan échoue, elle se mettra en « en retard ».
+
+Puis commit et push. Sans la balise `gpu-market-data`, la page essaie d’abord
+`gpu-market.json` à la racine, puis `data/gpu-market.json` — ça marche aussi, mais avec un
+404 inutile dans la console.
 
 ## 2. Créer le service dans Dokploy
 
