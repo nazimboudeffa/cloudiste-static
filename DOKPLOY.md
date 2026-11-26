@@ -1,0 +1,111 @@
+# Déployer cloudiste-static sur Dokploy
+
+Tu avais jusqu’ici une **Application statique** Dokploy buildée depuis le dépôt. Pour exécuter
+`scan_gpu.py` sur un cron, le montage le plus simple est de passer à un service
+**Docker Compose** (choisir bien « Docker Compose », pas « Stack » : Stack ne gère pas `build`).
+
+Tu pourras réutiliser le même domaine : crée le nouveau service, teste-le, ajoute le domaine,
+puis supprime l’ancienne application statique.
+
+## Fichiers prêts dans le dépôt
+
+| Fichier | Rôle |
+| --- | --- |
+| `Dockerfile` | Nginx qui copie les `.html` dans `/usr/share/nginx/html` |
+| `docker-compose.yml` | services `web` + `gpu-scan` et volume partagé `gpu-data` |
+| `Dockerfile.gpu-scan` | image Python avec `requests`, qui reste allumée |
+| `scan_gpu.py` | le scanner Vast.ai / Runpod, avec écriture atomique du JSON |
+| `.dockerignore` | évite d’envoyer `.env` et le JSON local dans le contexte de build |
+
+Le site est servi par `web`. Le conteneur `gpu-scan` écrit dans le volume partagé :
+`web` le monte en lecture seule sous `/usr/share/nginx/html/data`, donc l’URL publique est
+`https://ton-domaine/data/gpu-market.json`.
+
+## 1. Préparer la page
+
+Dans `gpu-market.html`, décommente la balise du `<head>` :
+
+```html
+<meta name="gpu-market-data" content="data/gpu-market.json">
+```
+
+Puis commit et push. Sans cette balise, la page essaie d’abord `gpu-market.json` à la racine,
+puis `data/gpu-market.json` — ça marche aussi, mais avec un 404 inutile dans la console.
+
+## 2. Créer le service dans Dokploy
+
+1. Dans ton projet Dokploy : **Nouveau service** → **Docker Compose**.
+2. Connecte le même dépôt Git et la même branche que ton application statique actuelle.
+3. Laisse le chemin du compose à `docker-compose.yml`.
+4. Onglet **Environment** : ajoute les variables :
+   ```text
+   VAST_API_KEY=...
+   RUNPOD_API_KEY=...
+   ```
+   Dokploy les enregistre dans un `.env` sur le serveur. Le compose utilise `${VAST_API_KEY}`
+   et `${RUNPOD_API_KEY}` pour les injecter dans `gpu-scan`. Ne mets jamais ces clés dans le dépôt.
+5. Clique sur **Deploy**. Le bouton **Preview Compose** permet de vérifier le fichier final
+   généré par Dokploy (labels Traefik, réseau, volumes).
+6. Onglet **Domains** : ajoute ton domaine existant, port **80**, active le HTTPS.
+
+L’ancienne application statique peut rester active le temps du test : utilise un autre domaine
+ou l’URL générée par Dokploy pour le nouveau service, puis bascule le DNS.
+
+## 3. Vérifier que ça tourne
+
+```bash
+docker compose ps
+curl -I https://ton-domaine/data/gpu-market.json
+```
+
+Au début le fichier n’existe pas encore : c’est normal. Lance une première fois le scanner
+à la main :
+
+```bash
+docker compose exec gpu-scan \
+  python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
+```
+
+Recharge `https://ton-domaine/gpu-market.html` : les offres doivent apparaître. Vérifie aussi
+que `https://ton-domaine/data/gpu-market.json` renvoie bien le tableau JSON.
+
+> Pourquoi `gpu-scan` reste allumé avec `sleep infinity` ? Dokploy exécute les jobs Compose
+> avec `docker exec` : le conteneur cible doit être démarré. Un conteneur qui se termine
+> immédiatement ne pourrait pas recevoir la commande du cron.
+
+## 4. Planifier le rafraîchissement
+
+Dans le service Compose : **Schedules / Tâches planifiées** → nouveau job.
+
+- Type : **Compose**
+- Service cible : `gpu-scan`
+- Commande :
+  ```bash
+  python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
+  ```
+- Cron : `0 */6 * * *` (toutes les 6 heures) ou `0 * * * *` (toutes les heures).
+
+Dokploy garde l’historique et les logs de chaque exécution. Le script écrit d’abord un `.tmp`
+puis le renomme, ce qui évite qu’une requête lise un JSON partiel.
+
+## 5. Détails importants
+
+- **Variables d’environnement** : dans l’onglet Environment de Dokploy, pas dans le dépôt.
+  `.env` est ignoré par Git et exclu du build Docker par `.dockerignore`.
+- **Stack à éviter** : le mode Stack de Dokploy n’autorise pas `build` dans le compose.
+- **Volumes** : `gpu-data` est un volume nommé, donc il survit aux redéploiements. Les anciennes
+  offres restent affichées tant que le cron n’a pas réécrit le fichier.
+- **Cache** : la page ajoute `?t=...` à chaque chargement, mais Cloudflare peut quand même
+  mettre le JSON en cache. Prévois une règle **Bypass cache** sur `/data/gpu-market.json`.
+- **Migration** : une fois le nouveau service validé, supprime l’ancienne Application statique
+  pour éviter deux services sur le même domaine.
+
+## Test local avant Dokploy
+
+```bash
+docker compose up -d --build
+docker compose exec gpu-scan \
+  python /app/scan_gpu.py --taux-eur 0.86 --json /data/gpu-market.json
+```
+
+Ouvre ensuite `http://localhost/gpu-market.html`.

@@ -1,0 +1,8 @@
+.git
+.env
+*.env
+__pycache__/
+*.pyc
+gpu-market.json
+data/
+DOKPLOY.md

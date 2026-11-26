@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Marché des GPU en France : prix à la demande par GPU et par heure, données Vast.ai et Runpod collectées par scan_gpu.py.">
+  <!-- Montage Dokploy avec volume partagé : décommenter la ligne ci-dessous. -->
+  <meta name="gpu-market-data" content="data/gpu-market.json">
+  <title>CloudistePAD - Marché des GPU</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-soft: #131a30;
+      --card: #18213a;
+      --text: #e8ecf8;
+      --muted: #9aa6c4;
+      --accent: #6ee7b7;
+      --accent-2: #818cf8;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(129, 140, 248, 0.18), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(110, 231, 183, 0.14), transparent 35%),
+        var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.92em; }
+
+    .wrap {
+      width: min(1100px, 92%);
+      margin-inline: auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: 1.2rem;
+      white-space: nowrap;
+    }
+
+    .brand .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 18px var(--accent);
+    }
+
+    nav { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.95rem; }
+    nav a { color: var(--muted); }
+    nav a:hover, nav a[aria-current="page"] { color: var(--text); }
+    nav a[aria-current="page"] { font-weight: 700; }
+
+    .hero { padding: 5rem 0 3rem; max-width: 820px; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.85rem;
+      background: rgba(110, 231, 183, 0.06);
+      margin-bottom: 1.4rem;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin: 0 0 1.2rem;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 0 2rem;
+    }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      font: inherit;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: var(--card);
+      cursor: pointer;
+    }
+
+    .btn.primary { background: var(--accent); color: #06231a; border-color: var(--accent); }
+    .btn:hover { text-decoration: none; transform: translateY(-1px); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, th button:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    section { padding: 3rem 0; border-top: 1px solid var(--border); }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.03em; margin: 0 0 1rem; }
+    h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.6rem 0 0;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, var(--card), var(--bg-soft));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat .value {
+      display: block;
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat small { color: var(--muted); }
+
+    .note {
+      border-left: 3px solid var(--accent-2);
+      padding: 1rem 1.2rem;
+      background: rgba(129, 140, 248, 0.07);
+      border-radius: 0 12px 12px 0;
+      color: var(--muted);
+      margin: 1.5rem 0;
+    }
+
+    .note.green { border-left-color: var(--accent); background: rgba(110, 231, 183, 0.07); }
+    .note.warn { border-left-color: #fbbf24; background: rgba(251, 191, 36, 0.07); }
+    .note p { margin: 0; }
+    .note p + p { margin-top: 0.6rem; }
+    .note strong { color: var(--text); }
+
+    .table-scroll {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .table-wide { min-width: 900px; }
+    .table-summary { min-width: 780px; }
+
+    th, td {
+      padding: 0.8rem 1rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--accent);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    th button {
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      cursor: pointer;
+    }
+
+    th button::after { content: " ↕"; opacity: 0.35; }
+    th[aria-sort="ascending"] button::after { content: " ↑"; opacity: 1; }
+    th[aria-sort="descending"] button::after { content: " ↓"; opacity: 1; }
+
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    td:first-child { font-weight: 700; }
+    td small { display: block; color: var(--muted); font-weight: 400; margin-top: 0.15rem; }
+
+    .price {
+      white-space: nowrap;
+      color: var(--accent);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      margin-top: 0.2rem;
+    }
+
+    .tag.ok { color: var(--accent); background: rgba(110, 231, 183, 0.08); border-color: rgba(110, 231, 183, 0.35); }
+    .tag.warn { color: #fbbf24; background: rgba(251, 191, 36, 0.08); border-color: rgba(251, 191, 36, 0.35); }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.8rem;
+      margin-top: 1.6rem;
+      padding: 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .field label, .toolbar .group-label {
+      display: block;
+      color: var(--accent);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.92rem;
+    }
+
+    .segmented { display: inline-flex; gap: 0.35rem; }
+    .segmented .btn { padding: 0.45rem 0.8rem; font-size: 0.9rem; }
+    .segmented .btn[aria-pressed="true"] { background: var(--accent); color: #06231a; border-color: var(--accent); }
+
+    .toolbar-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 1.2rem;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status strong { color: var(--text); }
+
+    .empty {
+      margin-top: 1.5rem;
+      padding: 2rem;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty h3 { color: var(--text); font-size: 1.2rem; }
+    .empty pre { text-align: left; margin: 1.2rem auto; max-width: 680px; }
+
+    pre {
+      background: #070b16;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      color: #d7e2ff;
+      font-size: 0.9rem;
+    }
+
+    ul.clean { padding-left: 1.2rem; color: var(--muted); }
+    ul.clean li { margin-bottom: 0.5rem; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0 3rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      nav { display: none; }
+      .hero { padding-top: 3.5rem; }
+      .toolbar { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script defer data-domain="cloudiste.fr" src="https://plausible.codewithadu.de/js/script.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand"><span class="dot"></span> CloudistePAD</div>
+      <nav>
+        <a href="index.html">Accueil</a>
+        <a href="comparatif.html">Comparatif GPU</a>
+        <a href="gpu-market.html" aria-current="page">Marché GPU</a>
+        <a href="https://github.com/nazimboudeffa/cloudiste-pad">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="badge">Vast.ai + Runpod · offres en France</div>
+        <h1>Le marché des <span>GPU</span>, en France.</h1>
+        <p class="lead">
+          Les prix à la demande collectés par <code>scan_gpu.py</code>, normalisés en prix par GPU
+          et par heure. Pour l’instant, deux sources : <strong>Vast.ai</strong> et <strong>Runpod</strong>.
+          Comparez le prix plancher de chaque modèle, puis ouvrez le détail des offres.
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#offres">Voir les offres</a>
+          <a class="btn" href="comparatif.html">Comparatif complet</a>
+        </div>
+      </div>
+
+      <section id="summary">
+        <h2>Prix plancher par GPU</h2>
+        <p class="lead">Le prix le plus bas observé pour chaque modèle, toutes offres confondues.</p>
+
+        <div class="stats">
+          <div class="stat"><span class="label">Offres relevées</span><span class="value" id="stat-offres">—</span></div>
+          <div class="stat"><span class="label">Modèles GPU</span><span class="value" id="stat-gpus">—</span></div>
+          <div class="stat"><span class="label">Fournisseurs</span><span class="value" id="stat-providers">—</span></div>
+          <div class="stat">
+            <span class="label">Meilleur prix</span>
+            <span class="value" id="stat-best">—</span>
+            <small id="stat-best-note"></small>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="table-summary">
+            <thead>
+              <tr>
+                <th>GPU</th>
+                <th>Prix plancher</th>
+                <th>Prix moyen</th>
+                <th>Fournisseurs</th>
+                <th>Offres</th>
+                <th>Meilleure offre</th>
+              </tr>
+            </thead>
+            <tbody id="summary-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="offres">
+        <h2>Toutes les offres</h2>
+        <p class="lead">Filtrez par modèle, fournisseur, lieu ou prix, puis cliquez sur un en-tête pour trier.</p>
+
+        <div class="note warn" id="demo-banner" hidden>
+          <p><strong>Aperçu de démonstration : ces prix sont fictifs.</strong> Remplacez-les par vos propres données avec <code>scan_gpu.py</code>.</p>
+        </div>
+
+        <div class="toolbar">
+          <div class="field">
+            <label for="q">Recherche</label>
+            <input id="q" type="search" placeholder="RTX 3090, Vast.ai, Paris…" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="provider">Fournisseur</label>
+            <select id="provider"><option value="">Tous</option></select>
+          </div>
+          <div class="field">
+            <label for="location">Lieu</label>
+            <select id="location"><option value="">Tous</option></select>
+          </div>
+          <div class="field">
+            <label for="max-price">Prix maximum</label>
+            <input id="max-price" type="number" min="0" step="0.01" placeholder="ex. 0,30">
+          </div>
+          <div class="field">
+            <span class="group-label" id="currency-label">Devise</span>
+            <div class="segmented" role="group" aria-labelledby="currency-label">
+              <button class="btn" type="button" data-currency="usd" aria-pressed="true">USD $</button>
+              <button class="btn" type="button" data-currency="eur" aria-pressed="false">EUR €</button>
+            </div>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn" type="button" id="refresh">Actualiser</button>
+            <button class="btn" type="button" id="reset">Réinitialiser les filtres</button>
+          </div>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite">Chargement des offres…</div>
+
+        <div class="table-scroll" id="offers-wrap">
+          <table class="table-wide">
+            <thead>
+              <tr>
+                <th><button type="button" data-sort="gpu">GPU</button></th>
+                <th><button type="button" data-sort="source">Fournisseur</button></th>
+                <th><button type="button" data-sort="price">Prix / GPU·h</button></th>
+                <th><button type="button" data-sort="nb_gpu">Nb GPU</button></th>
+                <th><button type="button" data-sort="ram">RAM / vCPU</button></th>
+                <th><button type="button" data-sort="lieu">Lieu</button></th>
+                <th><button type="button" data-sort="type">Type</button></th>
+                <th><button type="button" data-sort="stock">Dispo.</button></th>
+              </tr>
+            </thead>
+            <tbody id="offers-body"></tbody>
+          </table>
+        </div>
+
+        <div class="empty" id="empty" hidden>
+          <h3>Aucune donnée à afficher</h3>
+          <p id="empty-message">Générez d’abord le fichier d’offres depuis le script.</p>
+          <pre><code>python scan_gpu.py --taux-eur 0.86 --json gpu-market.json</code></pre>
+          <p>
+            Les variables <code>VAST_API_KEY</code> et <code>RUNPOD_API_KEY</code> doivent être définies.
+            Si vous ouvrez cette page en local, servez le dossier avec <code>python -m http.server 8000</code>
+            : les navigateurs bloquent la lecture du JSON en <code>file://</code>.
+          </p>
+          <p><button class="btn" type="button" id="demo-btn">Afficher un aperçu (données fictives)</button></p>
+        </div>
+
+        <p class="note" id="rate-note" hidden>
+          Certaines offres n’intègrent pas de prix EUR : la conversion est indicative, calculée avec
+          <strong>1 USD ≈ 0,86 EUR</strong>. Pour figer le taux, relancez le script avec <code>--taux-eur 0.86</code>.
+        </p>
+
+        <div class="note">
+          <p><strong>Méthode :</strong> prix par GPU et par heure, hors CPU, RAM, disque, réseau, taxes et frais de stockage. Le script ne retient que les offres disponibles à la demande dont la machine est en France.</p>
+          <p>Les offres marketplace changent vite : vérifiez toujours le prix final, la VM complète, l’accès SSH, les ports UDP de Sunshine et la persistance du disque avant de louer. <strong>Aucun lien d’affiliation sur cette page.</strong></p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Cloudiste PAD — prix GPU relevés par <code>scan_gpu.py</code>.</span>
+      <span><a href="index.html">Retour à l’accueil</a> · <a href="comparatif.html">Comparatif GPU</a></span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // Le script peut écrire à la racine du site ou dans un volume monté en /data.
+      // Une balise <meta name="gpu-market-data"> (ou ?data=...) force le chemin attendu.
+      const metaData = document.querySelector('meta[name="gpu-market-data"]');
+      const configuredData = new URLSearchParams(location.search).get("data") || (metaData && metaData.content);
+      const DATA_URLS = configuredData ? [configuredData] : ["gpu-market.json", "data/gpu-market.json"];
+      const EUR_RATE = 0.86;
+
+      // Uniquement pour l'aperçu quand le JSON n'existe pas encore.
+      const DEMO = [
+        { source: "Vast.ai", gpu: "RTX 3060", nb_gpu: 1, lieu: "FR", type: "À la demande", usd_gpu_h: 0.079, ram_go: 32, vcpu: 8 },
+        { source: "Vast.ai", gpu: "RTX 3090", nb_gpu: 1, lieu: "FR", type: "À la demande", usd_gpu_h: 0.119, ram_go: 64, vcpu: 16 },
+        { source: "Runpod (community)", gpu: "RTX 3090", nb_gpu: 1, lieu: "Paris", type: "À la demande", usd_gpu_h: 0.189, stock: "AVAILABLE" },
+        { source: "Vast.ai", gpu: "RTX 4090", nb_gpu: 1, lieu: "FR", type: "À la demande", usd_gpu_h: 0.239, ram_go: 128, vcpu: 16 },
+        { source: "Runpod (secure)", gpu: "RTX 4090", nb_gpu: 1, lieu: "Paris", type: "À la demande", usd_gpu_h: 0.339, stock: "LOW" },
+        { source: "Vast.ai", gpu: "A100 80GB", nb_gpu: 1, lieu: "FR", type: "À la demande", usd_gpu_h: 1.09, ram_go: 256, vcpu: 32 },
+        { source: "Runpod (secure)", gpu: "A100 80GB", nb_gpu: 1, lieu: "Paris", type: "À la demande", usd_gpu_h: 1.49, stock: "AVAILABLE" },
+        { source: "Vast.ai", gpu: "H100 SXM", nb_gpu: 8, lieu: "FR", type: "À la demande", usd_gpu_h: 1.79, ram_go: 512, vcpu: 64 },
+        { source: "Runpod (secure)", gpu: "H100 SXM", nb_gpu: 1, lieu: "Paris", type: "À la demande", usd_gpu_h: 2.49, stock: "AVAILABLE" }
+      ];
+
+      let offers = [];
+      let demo = false;
+      let updated = null;
+      let currency = "usd";
+      let sortKey = "price";
+      let sortDir = "asc";
+
+      const $ = (id) => document.getElementById(id);
+
+      function el(tag, cls, text) {
+        const node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text !== undefined && text !== null) node.textContent = String(text);
+        return node;
+      }
+
+      function cell(row, cls, text) {
+        const td = el("td", cls, text);
+        row.appendChild(td);
+        return td;
+      }
+
+      function normalize(o) {
+        return {
+          source: String(o.source || "?"),
+          gpu: String(o.gpu || "?").replace(/_/g, " "),
+          nb_gpu: Number(o.nb_gpu) || 1,
+          lieu: String(o.lieu || "—"),
+          type: String(o.type || "À la demande"),
+          usd_gpu_h: Number(o.usd_gpu_h),
+          eur_gpu_h: o.eur_gpu_h === undefined || o.eur_gpu_h === null ? null : Number(o.eur_gpu_h),
+          ram_go: o.ram_go === undefined || o.ram_go === null ? null : Number(o.ram_go),
+          vcpu: o.vcpu === undefined || o.vcpu === null ? null : Number(o.vcpu),
+          stock: o.stock === undefined || o.stock === null ? "" : String(o.stock)
+        };
+      }
+
+      function keyOf(name) {
+        return String(name).replace(/^nvidia\s+/i, "").replace(/[_-]+/g, " ")
+          .replace(/\s+/g, " ").trim().toLowerCase();
+      }
+
+      function providerOf(o) {
+        return o.source.split("(")[0].trim();
+      }
+
+      function priceOf(o) {
+        if (currency === "usd") return o.usd_gpu_h;
+        return o.eur_gpu_h === null ? o.usd_gpu_h * EUR_RATE : o.eur_gpu_h;
+      }
+
+      function fmt(value) {
+        return Number(value).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 3 });
+      }
+
+      function fmtPrice(value) {
+        return fmt(value) + " " + (currency === "eur" ? "€" : "$");
+      }
+
+      function formatDate(date) {
+        if (!(date instanceof Date) || isNaN(date.getTime())) return "date inconnue";
+        return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(date);
+      }
+
+      function makeGroups() {
+        const map = new Map();
+        offers.forEach((o) => {
+          const key = keyOf(o.gpu);
+          if (!map.has(key)) map.set(key, { name: o.gpu, list: [] });
+          map.get(key).list.push(o);
+        });
+        return Array.from(map.values()).sort((a, b) => {
+          const pa = Math.min.apply(null, a.list.map(priceOf));
+          const pb = Math.min.apply(null, b.list.map(priceOf));
+          return pa - pb || a.name.localeCompare(b.name, "fr");
+        });
+      }
+
+      function renderSummary(groups) {
+        const body = $("summary-body");
+        body.replaceChildren();
+
+        const best = offers.reduce((acc, o) => (!acc || o.usd_gpu_h < acc.usd_gpu_h ? o : acc), null);
+        $("stat-offres").textContent = offers.length;
+        $("stat-gpus").textContent = groups.length;
+        $("stat-providers").textContent = new Set(offers.map(providerOf)).size;
+        $("stat-best").textContent = best ? fmtPrice(priceOf(best)) : "—";
+        $("stat-best-note").textContent = best ? best.gpu : "";
+
+        groups.forEach((group) => {
+          const prices = group.list.map(priceOf);
+          const low = Math.min.apply(null, prices);
+          const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+          const bestOffer = group.list.find((o) => priceOf(o) === low);
+          const providers = Array.from(new Set(group.list.map(providerOf)));
+          const tr = el("tr");
+          cell(tr, null, group.name);
+          const tdLow = cell(tr, "price", fmtPrice(low));
+          tdLow.appendChild(el("span", "tag ok", "plancher"));
+          cell(tr, null, fmtPrice(avg));
+          const tdProviders = cell(tr, null, providers.length);
+          tdProviders.appendChild(el("small", null, providers.join(", ")));
+          cell(tr, null, group.list.length);
+          const tdBest = cell(tr, null, bestOffer.source);
+          tdBest.appendChild(el("small", null, bestOffer.lieu));
+          body.appendChild(tr);
+        });
+      }
+
+      function fillSelect(select, values, allLabel) {
+        const current = select.value;
+        select.replaceChildren();
+        const first = el("option", null, allLabel);
+        first.value = "";
+        select.appendChild(first);
+        values.forEach((value) => {
+          const option = el("option", null, value);
+          option.value = value;
+          select.appendChild(option);
+        });
+        select.value = values.indexOf(current) >= 0 ? current : "";
+      }
+
+      function valueFor(o, key) {
+        switch (key) {
+          case "price": return priceOf(o);
+          case "gpu": return keyOf(o.gpu);
+          case "source": return o.source.toLowerCase();
+          case "ram": return o.ram_go === null ? -1 : o.ram_go;
+          case "lieu": return o.lieu.toLowerCase();
+          case "type": return o.type.toLowerCase();
+          case "stock": return o.stock.toLowerCase();
+          default: return o.nb_gpu;
+        }
+      }
+
+      function maxPrice() {
+        const raw = $("max-price").value.trim().replace(",", ".");
+        if (!raw) return Infinity;
+        const value = Number(raw);
+        return Number.isFinite(value) ? value : Infinity;
+      }
+
+      function renderStatus(count) {
+        const status = $("status");
+        status.replaceChildren();
+        status.appendChild(el("strong", null, count + " offres affichées"));
+        status.appendChild(el("span", null, new Set(offers.map(providerOf)).size + " fournisseurs"));
+        status.appendChild(el("span", null, demo ? "Aperçu fictif" : "Mise à jour : " + formatDate(updated)));
+        status.appendChild(el("span", null, demo ? "Données d’exemple" : "Source : scan_gpu.py"));
+      }
+
+      function renderOffers() {
+        const query = $("q").value.trim().toLowerCase();
+        const provider = $("provider").value;
+        const location = $("location").value;
+        const ceiling = maxPrice();
+        const bestUsd = offers.reduce((acc, o) => (!acc || o.usd_gpu_h < acc ? o.usd_gpu_h : acc), Infinity);
+        const body = $("offers-body");
+
+        const rows = offers.filter((o) => {
+          if (provider && providerOf(o) !== provider) return false;
+          if (location && o.lieu !== location) return false;
+          if (priceOf(o) > ceiling) return false;
+          if (!query) return true;
+          return [o.gpu, o.source, o.lieu, o.type, o.stock]
+            .some((field) => field.toLowerCase().indexOf(query) >= 0);
+        });
+
+        rows.sort((a, b) => {
+          const va = valueFor(a, sortKey);
+          const vb = valueFor(b, sortKey);
+          const cmp = typeof va === "number" ? va - vb : String(va).localeCompare(String(vb), "fr");
+          return sortDir === "asc" ? cmp : -cmp;
+        });
+
+        body.replaceChildren();
+        if (!rows.length) {
+          const tr = el("tr");
+          const td = el("td", null, "Aucune offre ne correspond à ces filtres.");
+          td.colSpan = 8;
+          tr.appendChild(td);
+          body.appendChild(tr);
+        }
+
+        rows.forEach((o) => {
+          const tr = el("tr");
+          cell(tr, null, o.gpu);
+          cell(tr, null, o.source);
+          const tdPrice = cell(tr, "price", fmtPrice(priceOf(o)));
+          if (o.usd_gpu_h === bestUsd) tdPrice.appendChild(el("span", "tag ok", "meilleur prix"));
+          cell(tr, null, o.nb_gpu);
+          const tdConfig = cell(tr, null, o.ram_go === null && o.vcpu === null ? "—" : (o.ram_go === null ? "—" : o.ram_go + " Go RAM"));
+          if (o.vcpu !== null) tdConfig.appendChild(el("small", null, o.vcpu + " vCPU"));
+          cell(tr, null, o.lieu);
+          cell(tr, null, o.type);
+          const tdStock = cell(tr, null, o.stock || "—");
+          if (o.stock && /low|scarce|few|faible/i.test(o.stock)) tdStock.appendChild(el("span", "tag warn", "stock limité"));
+          body.appendChild(tr);
+        });
+
+        renderStatus(rows.length);
+      }
+
+      function updateSortHeaders() {
+        document.querySelectorAll("th button[data-sort]").forEach((button) => {
+          const th = button.closest("th");
+          if (button.dataset.sort === sortKey) {
+            th.setAttribute("aria-sort", sortDir === "asc" ? "ascending" : "descending");
+          } else {
+            th.removeAttribute("aria-sort");
+          }
+        });
+      }
+
+      function updateRateNote() {
+        $("rate-note").hidden = !(currency === "eur" && offers.some((o) => o.eur_gpu_h === null));
+      }
+
+      function renderAll() {
+        const groups = makeGroups();
+        renderSummary(groups);
+        fillSelect($("provider"), Array.from(new Set(offers.map(providerOf))).sort((a, b) => a.localeCompare(b, "fr")), "Tous");
+        fillSelect($("location"), Array.from(new Set(offers.map((o) => o.lieu))).sort((a, b) => a.localeCompare(b, "fr")), "Toutes");
+        updateRateNote();
+        updateSortHeaders();
+        renderOffers();
+      }
+
+      function showData() {
+        $("summary").hidden = false;
+        $("empty").hidden = true;
+        $("offers-wrap").hidden = false;
+      }
+
+      function showEmpty(error) {
+        offers = [];
+        demo = false;
+        $("summary").hidden = true;
+        $("offers-wrap").hidden = true;
+        $("empty").hidden = false;
+        $("demo-banner").hidden = true;
+        $("offers-body").replaceChildren();
+        $("summary-body").replaceChildren();
+        $("status").textContent = "Aucune donnée chargée.";
+        const detail = error && error.message ? error.message : "Fichier introuvable";
+        $("empty-message").textContent = detail + ". Fichiers attendus : gpu-market.json ou data/gpu-market.json.";
+      }
+
+      function fetchFirst(index, previousError) {
+        if (index >= DATA_URLS.length) {
+          return Promise.reject(previousError || new Error("Aucun fichier d’offres trouvé"));
+        }
+        const url = DATA_URLS[index] + "?t=" + Date.now();
+        return fetch(url, { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) throw new Error(DATA_URLS[index] + " : HTTP " + response.status);
+            const lastModified = response.headers.get("Last-Modified");
+            return response.json().then((data) => ({ data: data, lastModified: lastModified }));
+          })
+          .catch((error) => fetchFirst(index + 1, error));
+      }
+
+      function load() {
+        $("status").textContent = "Chargement des offres…";
+        fetchFirst(0)
+          .then((result) => {
+            if (!Array.isArray(result.data)) throw new Error("Le JSON doit contenir une liste d’offres");
+            offers = result.data.map(normalize).filter((o) => Number.isFinite(o.usd_gpu_h) && o.usd_gpu_h >= 0);
+            if (!offers.length) throw new Error("Le fichier ne contient aucune offre exploitable");
+            updated = result.lastModified ? new Date(result.lastModified) : null;
+            demo = false;
+            showData();
+            $("demo-banner").hidden = true;
+            renderAll();
+          })
+          .catch(showEmpty);
+      }
+
+      $("refresh").addEventListener("click", load);
+      $("demo-btn").addEventListener("click", () => {
+        offers = DEMO.map(normalize);
+        demo = true;
+        updated = null;
+        showData();
+        $("demo-banner").hidden = false;
+        renderAll();
+      });
+      $("reset").addEventListener("click", () => {
+        $("q").value = "";
+        $("provider").value = "";
+        $("location").value = "";
+        $("max-price").value = "";
+        sortKey = "price";
+        sortDir = "asc";
+        updateSortHeaders();
+        renderOffers();
+      });
+      $("q").addEventListener("input", renderOffers);
+      $("provider").addEventListener("change", renderOffers);
+      $("location").addEventListener("change", renderOffers);
+      $("max-price").addEventListener("input", renderOffers);
+
+      document.querySelectorAll("th button[data-sort]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.sort;
+          if (sortKey === key) {
+            sortDir = sortDir === "asc" ? "desc" : "asc";
+          } else {
+            sortKey = key;
+            sortDir = key === "price" || key === "gpu" || key === "source" || key === "lieu" ? "asc" : "desc";
+          }
+          updateSortHeaders();
+          renderOffers();
+        });
+      });
+
+      document.querySelectorAll("button[data-currency]").forEach((button) => {
+        button.addEventListener("click", () => {
+          currency = button.dataset.currency;
+          document.querySelectorAll("button[data-currency]").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b === button));
+          });
+          renderAll();
+        });
+      });
+
+      load();
+    })();
+  </script>
+</body>
+</html>
