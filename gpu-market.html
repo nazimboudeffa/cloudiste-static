@@ -240,10 +240,9 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .stat .value.countdown { font-size: 1.45rem; }
     .stat small { color: var(--muted); }
 
-    /* Compte à rebours : même contenu dans le hero et dans le résumé. */
+    /* Compte à rebours, affiché dans le hero. */
     .countdown-hero {
       display: flex;
       align-items: center;
@@ -293,26 +292,8 @@
 
     .countdown-detail { color: var(--muted); font-size: 0.9rem; }
 
-    .stat.countdown-card {
-      border-color: rgba(110, 231, 183, 0.42);
-      background: linear-gradient(150deg, rgba(110, 231, 183, 0.14), rgba(129, 140, 248, 0.08)), var(--card);
-      box-shadow: 0 12px 34px rgba(110, 231, 183, 0.09);
-    }
-
-    .mini-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      margin-right: 0.4rem;
-      border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-      vertical-align: 1px;
-      animation: live-pulse 2s infinite;
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      .live-dot, .mini-dot { animation: none; }
+      .live-dot { animation: none; }
     }
 
     .note {
@@ -540,11 +521,6 @@
             <span class="label">Meilleur prix</span>
             <span class="value" id="stat-best">—</span>
             <small id="stat-best-note"></small>
-          </div>
-          <div class="stat countdown-card">
-            <span class="label"><span class="mini-dot" aria-hidden="true"></span> Prochain scan estimé</span>
-            <span class="value countdown" id="stat-next">—</span>
-            <small id="stat-next-note"></small>
           </div>
         </div>
 
@@ -862,15 +838,10 @@
           }
         }
 
-        // Le hero et le résumé affichent exactement les mêmes informations.
-        ["hero-next", "stat-next"].forEach((id) => {
-          const node = $(id);
-          if (node) node.textContent = valueText;
-        });
-        ["hero-next-note", "stat-next-note"].forEach((id) => {
-          const node = $(id);
-          if (node) node.textContent = noteText;
-        });
+        const valueNode = $("hero-next");
+        const noteNode = $("hero-next-note");
+        if (valueNode) valueNode.textContent = valueText;
+        if (noteNode) noteNode.textContent = noteText;
       }
 
       function makeGroups() {
