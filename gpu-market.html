@@ -243,6 +243,78 @@
     .stat .value.countdown { font-size: 1.45rem; }
     .stat small { color: var(--muted); }
 
+    /* Compte à rebours : même contenu dans le hero et dans le résumé. */
+    .countdown-hero {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.8rem;
+      padding: 1.1rem 1.35rem;
+      border-radius: 18px;
+      border: 1px solid rgba(110, 231, 183, 0.38);
+      background:
+        linear-gradient(120deg, rgba(110, 231, 183, 0.14), rgba(129, 140, 248, 0.12)),
+        var(--card);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    }
+
+    .live-dot {
+      flex: 0 0 auto;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+      animation: live-pulse 2s infinite;
+    }
+
+    @keyframes live-pulse {
+      70% { box-shadow: 0 0 0 13px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .countdown-eyebrow {
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      font-weight: 700;
+    }
+
+    .countdown-value {
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      text-shadow: 0 0 26px rgba(110, 231, 183, 0.35);
+    }
+
+    .countdown-detail { color: var(--muted); font-size: 0.9rem; }
+
+    .stat.countdown-card {
+      border-color: rgba(110, 231, 183, 0.42);
+      background: linear-gradient(150deg, rgba(110, 231, 183, 0.14), rgba(129, 140, 248, 0.08)), var(--card);
+      box-shadow: 0 12px 34px rgba(110, 231, 183, 0.09);
+    }
+
+    .mini-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 0.4rem;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      vertical-align: 1px;
+      animation: live-pulse 2s infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot, .mini-dot { animation: none; }
+    }
+
     .note {
       border-left: 3px solid var(--accent-2);
       padding: 1rem 1.2rem;
@@ -446,6 +518,14 @@
           et par heure. Pour l’instant, deux sources : <strong>Vast.ai</strong> et <strong>Runpod</strong>.
           Comparez le prix plancher de chaque modèle, puis ouvrez le détail des offres.
         </p>
+        <div class="countdown-hero" id="countdown-hero">
+          <span class="live-dot" aria-hidden="true"></span>
+          <div>
+            <div class="countdown-eyebrow">Prochain scan estimé</div>
+            <div class="countdown-value" id="hero-next">—</div>
+            <div class="countdown-detail" id="hero-next-note"></div>
+          </div>
+        </div>
       </div>
 
       <section id="summary">
@@ -461,8 +541,8 @@
             <span class="value" id="stat-best">—</span>
             <small id="stat-best-note"></small>
           </div>
-          <div class="stat">
-            <span class="label">Prochain scan estimé</span>
+          <div class="stat countdown-card">
+            <span class="label"><span class="mini-dot" aria-hidden="true"></span> Prochain scan estimé</span>
             <span class="value countdown" id="stat-next">—</span>
             <small id="stat-next-note"></small>
           </div>
@@ -761,28 +841,36 @@
 
       function updateCountdown() {
         const target = nextScanTime();
-        const value = $("stat-next");
-        const note = $("stat-next-note");
-        if (!target) {
-          value.textContent = "—";
-          note.textContent = demo ? "aperçu fictif" : "date de mise à jour inconnue";
-          return;
+        let valueText = "—";
+        let noteText = demo ? "aperçu fictif" : "date de mise à jour inconnue";
+
+        if (target) {
+          const expected = previousScanTime();
+          const late = expected
+            ? updated.getTime() < expected.getTime() + 15 * 60000
+            : target.getTime() <= Date.now();
+          if (late) {
+            valueText = "en retard";
+            noteText = "scan attendu vers " + formatShortDate(expected || target);
+          } else {
+            const minutes = Math.ceil((target.getTime() - Date.now()) / 60000);
+            const hours = Math.floor(minutes / 60);
+            const rest = minutes % 60;
+            valueText = (hours ? hours + " h " : "") + rest + " min";
+            noteText = (SCHEDULE_MODE === "daily" ? "minuit " + SCAN_TZ + " · " : "")
+              + "vers " + formatShortDate(target);
+          }
         }
-        const expected = previousScanTime();
-        const late = expected
-          ? updated.getTime() < expected.getTime() + 15 * 60000
-          : target.getTime() <= Date.now();
-        if (late) {
-          value.textContent = "en retard";
-          note.textContent = "scan attendu vers " + formatShortDate(expected || target);
-          return;
-        }
-        const minutes = Math.ceil((target.getTime() - Date.now()) / 60000);
-        const hours = Math.floor(minutes / 60);
-        const rest = minutes % 60;
-        value.textContent = (hours ? hours + " h " : "") + rest + " min";
-        note.textContent = (SCHEDULE_MODE === "daily" ? "minuit " + SCAN_TZ + " · " : "")
-          + "vers " + formatShortDate(target);
+
+        // Le hero et le résumé affichent exactement les mêmes informations.
+        ["hero-next", "stat-next"].forEach((id) => {
+          const node = $(id);
+          if (node) node.textContent = valueText;
+        });
+        ["hero-next-note", "stat-next-note"].forEach((id) => {
+          const node = $(id);
+          if (node) node.textContent = noteText;
+        });
       }
 
       function makeGroups() {
