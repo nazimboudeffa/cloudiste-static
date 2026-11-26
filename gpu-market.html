@@ -307,6 +307,16 @@
 
     .note.green { border-left-color: var(--accent); background: rgba(110, 231, 183, 0.07); }
     .note.warn { border-left-color: #fbbf24; background: rgba(251, 191, 36, 0.07); }
+
+    /* Bandeau d’alerte du hero, identique sur les trois pages. */
+    .note.red {
+      border-left: 3px solid #ef4444;
+      padding: 1rem 1.2rem;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 0 12px 12px 0;
+      color: var(--muted);
+      margin: 1.5rem 0;
+    }
     .note p { margin: 0; }
     .note p + p { margin-top: 0.6rem; }
     .note strong { color: var(--text); }

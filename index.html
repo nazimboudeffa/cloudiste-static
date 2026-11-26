@@ -232,6 +232,16 @@
       color: var(--muted);
     }
 
+    /* Bandeau d’alerte du hero, identique sur les trois pages. */
+    .note.red {
+      border-left: 3px solid #ef4444;
+      padding: 1rem 1.2rem;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 0 12px 12px 0;
+      color: var(--muted);
+      margin: 1.5rem 0;
+    }
+
     .note strong { color: var(--text); }
 
     pre {
@@ -280,6 +290,9 @@
       <div class="hero">
         <div class="badge">Fork de Cloudypad · AGPL-3.0</div>
         <h1>Votre Jeu Vidéo,<br><span>dans le cloud.</span></h1>
+        <div class="note red">
+          <p><strong>Ce projet est à un stade expérimental.</strong></p>
+        </div>
         <p class="lead">
           Cloudiste PAD est une mini plateforme de cloud gaming autonome : un seul script
           déploie Sunshine sur une VM GPU, et Moonlight sert de client. Pas de compte,
