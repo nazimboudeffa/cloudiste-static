@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cloud gaming libre sur VM GPU | CloudistePAD</title>
-  <meta name="description" content="CloudistePAD : cloud gaming libre sur VM GPU. Déployez Sunshine en un script, louez chez Vast.ai ou Runpod et jouez avec Moonlight.">
+  <meta name="description" content="CloudistePAD : cloud gaming libre sur VM GPU. Déployez Sunshine en un script sur une VM Ubuntu compatible, puis jouez avec Moonlight.">
   <link rel="canonical" href="https://cloudiste.fr/">
   <link rel="alternate" hreflang="fr" href="https://cloudiste.fr/">
   <link rel="alternate" hreflang="x-default" href="https://cloudiste.fr/">
@@ -35,7 +35,7 @@
         "url": "https://cloudiste.fr/",
         "name": "CloudistePAD",
         "inLanguage": "fr",
-        "description": "Cloud gaming libre sur VM GPU avec Vast.ai, Runpod, Sunshine et Moonlight.",
+        "description": "Cloud gaming libre sur une VM Ubuntu avec GPU NVIDIA, avec Sunshine et Moonlight.",
         "publisher": { "@id": "https://cloudiste.fr/#organization" }
       },
       {
@@ -296,14 +296,32 @@
         </div>
         <p class="lead">
           Cloudiste PAD est une mini plateforme de cloud gaming autonome : un seul script
-          déploie Sunshine sur une VM GPU, et Moonlight sert de client. Pas de compte,
-          pas de base de données, pas d’interface à administrer.
+          déploie Sunshine sur une VM Ubuntu complète avec GPU NVIDIA, et Moonlight sert
+          de client. Pas de compte, pas de base de données, pas d’interface à administrer.
         </p>
         <div class="actions">
-          <a class="btn primary" href="gpu-market.html">Voir le marché GPU <span class="live">en direct</span></a>
+          <a class="btn primary" href="gpu-market.html">Voir les prix du marché GPU <span class="live">en direct</span></a>
           <a class="btn" href="comparatif.html">Voir le comparatif GPU</a>
         </div>
       </div>
+
+      <section id="compatibilite">
+        <h2>Script CloudistePAD et offres GPU : bien distinguer</h2>
+        <p class="lead">Le script déploie un serveur de jeu sur une machine complète. Le marché GPU et le comparatif recensent des offres de location : un prix de GPU ne garantit pas une machine compatible.</p>
+        <div class="grid">
+          <div class="card">
+            <h3>Ce qu’attend le script</h3>
+            <p>Une <strong>VM Ubuntu x86_64 complète</strong> (pas un pod ni un conteneur), avec SSH et root/sudo, pilote NVIDIA et <code>nvidia-smi</code> fonctionnels, Docker et un GPU NVIDIA compatible NVENC. Le réseau doit permettre la connexion Moonlight : Tailscale par défaut, ou ports UDP dédiés ouverts.</p>
+          </div>
+          <div class="card">
+            <h3>Ce que montre le marché</h3>
+            <p>Des <strong>prix de GPU à la demande</strong>, par GPU et par heure, chez Vast.ai et Runpod. Peuvent y figurer des GPU datacenter, des machines multi-GPU ou des offres conteneurisées. Le prix affiché exclut CPU, RAM, disque, réseau et taxes, et ne valide pas la compatibilité CloudistePAD.</p>
+          </div>
+        </div>
+        <div class="note" style="margin-top: 1.5rem;">
+          <p><strong>Avant de lancer <code>deploy.sh</code> :</strong> vérifie que l’offre est bien une VM complète, que le disque est persistant et que les besoins réseau sont couverts. Le <a href="comparatif.html#analyse">comparatif détaille les verdicts par fournisseur</a> et sa <a href="comparatif.html#checklist">checklist avant location</a> : par exemple, Runpod est déconseillé tant que les contraintes VM/UDP ne sont pas confirmées, malgré sa présence dans le marché GPU.</p>
+        </div>
+      </section>
 
       <section id="fonctions">
         <h2>Pensé pour un usage perso</h2>
@@ -331,7 +349,7 @@
           </div>
           <div class="card">
             <h3>Documenté</h3>
-            <p>Un tutoriel Vast.ai accompagne le déploiement, du SSH jusqu’au premier lancement de Moonlight.</p>
+            <p>Un tutoriel Vast.ai sert d’exemple de déploiement, du SSH jusqu’au premier lancement de Moonlight ; il ne limite pas le script à ce fournisseur.</p>
           </div>
         </div>
       </section>
@@ -348,8 +366,10 @@
             <a href="https://moonlight-stream.org/">Moonlight</a>.
           </p>
           <p>
-            Ce fork simplifie le projet pour un cas d’usage unique : une VM GPU louée chez
-            Vast.ai, un seul joueur, et un déploiement direct par script. Ce n’est pas un
+            Ce fork simplifie le projet pour un cas d’usage unique : une VM complète avec GPU
+            NVIDIA, un seul joueur, et un déploiement direct par script. Le tutoriel Vast.ai
+            illustre ce cas, mais tous les fournisseurs ne louent pas une VM compatible
+            (voir le <a href="comparatif.html">comparatif</a>). Ce n’est pas un
             produit officiel Cloudypad. Le code d’origine est distribué sous licence
             <a href="https://www.gnu.org/licenses/agpl-3.0.fr.html">AGPL-3.0</a> ; cette
             source est donc fournie conformément à cette licence.
@@ -359,7 +379,7 @@
 
       <section id="demarrage">
         <h2>Démarrage rapide</h2>
-        <p class="lead">Sur une VM Ubuntu avec driver NVIDIA déjà installé :</p>
+        <p class="lead">Sur une VM Ubuntu complète (x86_64) avec accès SSH/root et driver NVIDIA déjà installé :</p>
         <pre><code>curl -fsSL https://raw.githubusercontent.com/nazimboudeffa/cloudiste-pad/main/deploy.sh -o deploy.sh
 bash deploy.sh deploy</code></pre>
         <ol class="steps">
@@ -368,7 +388,9 @@ bash deploy.sh deploy</code></pre>
           <li>Ouvre <code>https://&lt;IP-Tailscale&gt;:47990</code> et connecte-toi avec <code>cloudy</code>.</li>
           <li>Dans Moonlight, ajoute l’IP Tailscale et saisis le PIN affiché dans Sunshine.</li>
         </ol>
-        <p>Le détail de chaque étape est dans le <a href="https://github.com/nazimboudeffa/cloudiste-pad/blob/main/doc/vast-ai.md">tutoriel Vast.ai</a>.</p>
+        <div class="note">
+          <p>Une offre du marché GPU n’est pas forcément une telle VM : vérifie la nature de l’instance, l’accès SSH et la persistance du disque avant de lancer le script. Le détail de chaque étape est dans le <a href="https://github.com/nazimboudeffa/cloudiste-pad/blob/main/doc/vast-ai.md">tutoriel Vast.ai</a>.</p>
+        </div>
       </section>
     </main>
 
