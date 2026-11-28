@@ -845,8 +845,11 @@
 
         if (target) {
           const expected = previousScanTime();
+          // Le scan attendu à `expected` doit avoir réécrit le JSON. La tolérance
+          // de 15 min absorbe une dérive du cron ; elle ne doit pas considérer
+          // comme « en retard » un fichier tout juste écrit après minuit.
           const late = expected
-            ? updated.getTime() < expected.getTime() + 15 * 60000
+            ? updated.getTime() < expected.getTime() - 15 * 60000
             : target.getTime() <= Date.now();
           if (late) {
             valueText = "en retard";
